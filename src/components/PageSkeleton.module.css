@@ -1,0 +1,286 @@
+/* ===================================================
+   PageSkeleton — Blinkit-style shimmer skeleton
+   Matches the exact layout of the homepage.
+   Every shimmer div has the same dimensions as its
+   real counterpart to guarantee CLS = 0.
+   =================================================== */
+
+/* --- Shared shimmer animation --- */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 40%,
+    #f0f0f0 80%
+  );
+  background-size: 300% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* --- Mobile Header Skeleton --- */
+.mobileHeaderSkeleton {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 10px 14px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  /* Reserve exact same height as real MobileHeader */
+  min-height: 110px;
+}
+
+.mobileHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+}
+
+.logoShimmer {
+  width: 120px;
+  height: 32px;
+  border-radius: 6px;
+}
+
+.loginBtnShimmer {
+  width: 64px;
+  height: 28px;
+  border-radius: 6px;
+}
+
+.mobileHeaderBottom {
+  display: flex;
+  gap: 8px;
+  height: 36px;
+}
+
+.locationShimmer {
+  flex: 1;
+  height: 34px;
+  border-radius: 8px;
+}
+
+.searchShimmer {
+  flex: 1.5;
+  height: 34px;
+  border-radius: 8px;
+}
+
+/* --- Page Body (below the fixed header) --- */
+.pageBody {
+  padding-top: 118px; /* matches mobile header height + gap */
+  padding-bottom: 80px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* --- Category Chips Row --- */
+.categoryRow {
+  display: flex;
+  gap: 10px;
+  padding: 12px 14px;
+  overflow: hidden;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.categoryChip {
+  flex: 0 0 auto;
+  width: 64px;
+  height: 72px;
+  border-radius: 12px;
+}
+
+/* --- Hero Banner --- */
+.heroBanner {
+  margin: 12px 14px;
+  height: 160px;
+  border-radius: 14px;
+}
+
+/* --- Section heading row --- */
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 14px 8px;
+}
+
+.sectionTitle {
+  width: 140px;
+  height: 18px;
+  border-radius: 6px;
+}
+
+.sectionLink {
+  width: 60px;
+  height: 16px;
+  border-radius: 6px;
+}
+
+/* --- Product Grid (2-col mobile) --- */
+.productGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding: 0 14px 16px;
+}
+
+.productCard {
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+}
+
+.productImageShimmer {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 0;
+}
+
+.productBody {
+  padding: 8px 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.productNameShimmer {
+  width: 80%;
+  height: 13px;
+  border-radius: 4px;
+}
+
+.productNameShimmer2 {
+  width: 55%;
+  height: 13px;
+  border-radius: 4px;
+}
+
+.productPriceShimmer {
+  width: 50%;
+  height: 16px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.productBtnShimmer {
+  width: 100%;
+  height: 30px;
+  border-radius: 8px;
+  margin-top: 6px;
+}
+
+/* --- Desktop Header Skeleton --- */
+.desktopHeaderSkeleton {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 20px;
+}
+
+.desktopLogoShimmer {
+  width: 150px;
+  height: 44px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.desktopLocationShimmer {
+  width: 180px;
+  height: 36px;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.desktopSearchShimmer {
+  flex: 1;
+  height: 42px;
+  border-radius: 24px;
+  max-width: 600px;
+}
+
+.desktopActionsShimmer {
+  display: flex;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.desktopBtnShimmer {
+  width: 80px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.desktopCartShimmer {
+  width: 100px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+/* Mobile-only / Desktop-only visibility */
+@media (max-width: 767px) {
+  .desktopHeaderSkeleton { display: none; }
+}
+
+@media (min-width: 768px) {
+  .mobileHeaderSkeleton { display: none; }
+  .pageBody { padding-top: 76px; }
+  .heroBanner { height: 240px; margin: 16px 0; }
+  .productGrid {
+    grid-template-columns: repeat(4, 1fr);
+    padding: 0 24px 16px;
+    gap: 16px;
+  }
+  .categoryRow { padding: 16px 24px; }
+  .categoryChip { width: 80px; height: 88px; }
+}
+
+/* --- Mobile Bottom Nav Skeleton --- */
+.mobileBottomNavSkeleton {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 16px;
+  z-index: 1000;
+}
+
+.navItemShimmer {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}
+
+@media (min-width: 768px) {
+  .mobileBottomNavSkeleton { display: none; }
+}

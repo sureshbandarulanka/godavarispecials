@@ -1,0 +1,333 @@
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px 16px; 
+  display: flex;
+  gap: 24px;
+  min-height: calc(100vh - 200px);
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 250px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 86px; /* Below fixed header + pt-4 padding */
+  height: max-content;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-color, #eaeaea);
+  padding: 16px 0;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Custom scrollbar for sidebar */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: #ddd;
+  border-radius: 4px;
+}
+
+.sidebarTitle {
+  padding: 0 16px 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary, #1c1c1c);
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+  margin-bottom: 8px;
+}
+
+.categoryList {
+  display: flex;
+  flex-direction: column;
+}
+
+.categoryItem {
+  padding: 12px 20px;
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text-secondary, #666);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  border-left: 3px solid transparent;
+}
+
+.categoryItem:hover {
+  background: rgba(52, 114, 186, 0.05);
+  color: var(--brand-blue, #3472ba);
+}
+
+.categoryActive {
+  background: rgba(52, 114, 186, 0.08);
+  color: var(--brand-blue, #3472ba);
+  font-weight: 600;
+  border-left-color: var(--brand-blue, #3472ba);
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  margin-top: 16px; /* Added top margin */
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0px;
+}
+
+.titleArea {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.filterToggleButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: #fff;
+  border: 1.5px solid #eaeaea;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  flex-shrink: 0;
+}
+
+.filterToggleButton svg {
+  color: #666;
+}
+
+.filterToggleButton:hover {
+  background: #f8f9fa;
+  border-color: #ddd;
+}
+
+.filterToggleButton.active {
+  background: #fecc58;
+  border-color: #fecc58;
+  color: #000;
+  box-shadow: 0 4px 12px rgba(254, 204, 88, 0.2);
+}
+
+.filterToggleButton.active svg {
+  color: #000;
+}
+
+.filterBar {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px; /* Increased from 10px */
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 14px;
+  flex-wrap: wrap;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterGroup label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.filterGroup select {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  background: #f8f9fa;
+}
+
+.filterGroup select:focus {
+  border-color: var(--brand-blue);
+}
+
+.pageTitle {
+  font-size: 20px; /* Reduced from 24px */
+  font-weight: 750;
+  color: var(--text-primary, #1c1c1c);
+  text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productCount {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+  border: 1px dashed var(--border-color, #eaeaea);
+  text-align: center;
+}
+
+.emptyIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary, #1c1c1c);
+  margin-bottom: 8px;
+}
+
+.emptySub {
+  font-size: 14px;
+  color: var(--text-secondary, #666);
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    padding: 12px 8px; /* Increased top padding from 0 to 12px */
+    gap: 8px;
+  }
+  
+  .sidebar {
+    display: none;
+  }
+  
+  .mainContent {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    justify-items: center;
+    width: 100%;
+  }
+}
+
+.subCategoryContainer {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none; /* Firefox */
+}
+
+.subCategoryContainer::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.subCategoryBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: white;
+  border: 1.5px solid #eaeaea;
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #444;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.subCategoryBtn:hover {
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
+  transform: translateY(-1px);
+}
+
+.subCategoryBtnActive {
+  background: var(--brand-blue);
+  border-color: var(--brand-blue);
+  color: white;
+  box-shadow: 0 4px 12px rgba(52, 114, 186, 0.25);
+}
+
+.subCategoryIcon {
+  font-size: 16px;
+}
+
+@media (max-width: 767px) {
+  .subCategoryContainer {
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 4px 0 12px;
+  }
+  
+  .subCategoryBtn {
+    padding: 6px 14px;
+    font-size: 12px;
+    gap: 6px;
+    border-width: 1px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+  }
+  
+  .subCategoryIcon {
+    font-size: 14px;
+  }
+}
+

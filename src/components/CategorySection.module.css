@@ -1,0 +1,153 @@
+.section {
+  padding: 8px 0;
+  margin-bottom: 8px; 
+}
+
+.alternateBg {
+  background-color: #f8fafc; /* bg-gray-50 */
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-size: 24px; /* text-lg / bigger */
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.viewAll {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-blue);
+  text-decoration: none;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.viewAll:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+.scrollButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.scrollBtn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+
+.scrollBtn:hover {
+  background: var(--brand-blue);
+  color: white;
+  border-color: var(--brand-blue);
+  box-shadow: var(--shadow-md);
+}
+
+.scrollBtn:active {
+  transform: scale(0.9);
+}
+
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 8px 4px 24px 4px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  scroll-behavior: smooth;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.carouselItem {
+  flex: 0 0 calc(50% - 12px); /* 2 cards per row on mobile basically */
+  min-width: 180px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0; /* Let global .container handle it or bleed */
+    width: 100%;
+  }
+
+  /* Also reset global container padding inside section to avoid double-padding (BestOffers uses global .container) */
+  .section > :global(.container) {
+    padding: 0;
+  }
+
+  .carousel {
+    gap: 8px;
+    padding-bottom: 8px;
+    padding-left: 16px;
+    padding-right: 16px;
+    align-items: stretch; /* Force all cards to same height */
+  }
+
+  .carouselItem {
+    flex: 0 0 calc((100% - 16px) / 3);
+    min-width: 100px;
+    display: flex;
+    flex-direction: column;
+    height: 240px; /* Match card fixed height */
+  }
+
+  .title {
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .header {
+    margin-bottom: 10px;
+    padding: 0 16px;
+  }
+
+  .scrollButtons {
+    display: none; /* Hide scroll buttons on mobile for more space */
+  }
+}
+
+@media (min-width: 768px) {
+  .carouselItem {
+    flex: 0 0 calc(25% - 12px); /* 4 cards on tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .carouselItem {
+    flex: 0 0 calc(16.66% - 14px); /* 6 cards precisely */
+    max-width: 210px;
+  }
+}

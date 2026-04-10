@@ -1,0 +1,276 @@
+.page {
+  padding-top: 86px;
+  padding-bottom: 60px;
+  max-width: 800px;
+}
+
+.pageTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.emptyIcon {
+  font-size: 64px;
+  margin-bottom: 16px;
+}
+
+.emptyTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.emptySubtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 32px;
+  max-width: 300px;
+}
+
+.ordersList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.orderCard {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+
+.orderCard:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cardHeader {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.headerMain {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orderId {
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.orderDate {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.statusBadge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.cardBody {
+  padding: 0 20px 16px;
+  display: flex;
+  gap: 32px;
+}
+
+.summaryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.cardActions {
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px dashed var(--border-color);
+}
+
+.btnDetails {
+  background: none;
+  border: none;
+  color: var(--brand-blue);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0;
+}
+
+.btnTrack {
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btnTrack:hover {
+  opacity: 0.9;
+}
+
+.detailsSection {
+  padding: 16px 20px;
+  background: #fcfcfc;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border-color);
+  margin-bottom: 16px;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.itemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.itemQty {
+  color: var(--text-secondary);
+  font-weight: 700;
+  margin-right: 12px;
+}
+
+.itemName {
+  flex: 1;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.itemPrice {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.deliveryInfo {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.infoRow {
+  display: flex;
+  gap: 8px;
+  font-size: 0.85rem;
+}
+
+.infoLabel {
+  color: var(--text-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.infoValue {
+  color: var(--text-primary);
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding-top: 24px;
+    padding-bottom: 160px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .pageTitle {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+  }
+
+  .emptyState {
+    padding: 60px 16px;
+    border-radius: 12px;
+  }
+
+  .emptyIcon {
+    font-size: 48px;
+  }
+
+  .emptyTitle {
+    font-size: 18px;
+  }
+
+  .cardHeader {
+    padding: 12px 16px;
+  }
+
+  .cardBody {
+    padding: 0 16px 12px;
+    gap: 16px;
+  }
+
+  .cardActions {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .btnTrack {
+    width: 100%;
+    text-align: center;
+  }
+
+  .detailsSection {
+    padding: 12px 16px;
+  }
+}

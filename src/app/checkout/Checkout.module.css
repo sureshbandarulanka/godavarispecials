@@ -1,0 +1,775 @@
+.checkoutPage {
+  background: #f4f6fb;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 16px 160px; /* Increased bottom padding for sticky bar */
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.pageTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #1c1c1c;
+}
+
+.editCartBtn {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.checkoutLayout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 992px) {
+  .checkoutLayout {
+    grid-template-columns: 1fr 380px;
+  }
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sectionCard {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.sectionIcon {
+  font-size: 22px;
+}
+
+.sectionHeader h3 {
+  font-size: 18px;
+  font-weight: 800;
+  flex: 1;
+  margin: 0;
+}
+
+.addBtn {
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.secureBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0fdf4;
+  color: #16a34a;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  border: 1px solid #dcfce7;
+}
+
+.shieldIcon {
+  font-size: 12px;
+}
+
+/* Address List */
+.addressList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 600px) {
+  .addressList {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.addressCard {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.addressSelected {
+  border-color: var(--brand-blue);
+  background: #f0f7fd;
+  box-shadow: 0 4px 12px rgba(52, 114, 186, 0.05);
+}
+
+.addrHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.addrName {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.addrActions {
+  display: flex;
+  gap: 12px;
+}
+
+.addrActions button {
+  background: none;
+  border: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.deleteText {
+  color: #ff4d4d !important;
+}
+
+.addrText {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.5;
+  margin-bottom: 8px;
+}
+
+.addrPhone {
+  font-size: 12px;
+  font-weight: 600;
+  color: #444;
+}
+
+/* Form Styles */
+.addressForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+@media (min-width: 600px) {
+  .formGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroup label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.formGroup input {
+  padding: 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fcfcfc;
+  transition: all 0.2s;
+}
+
+.formGroup input:focus {
+  border-color: var(--brand-blue);
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 114, 186, 0.1);
+}
+
+.formActions {
+  display: flex;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.saveBtn {
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  flex: 1;
+}
+
+.cancelBtn {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 14px 24px;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Payment Layout */
+.paymentList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.paymentCard {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: 1.5px solid #eee;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.paymentCard:hover {
+  border-color: #ddd;
+  background: #fafafa;
+}
+
+.paymentCardActive {
+  border-color: var(--brand-blue);
+  background: #f0f7fd;
+  box-shadow: 0 4px 15px rgba(52, 114, 186, 0.08);
+}
+
+.paymentCardActive::after {
+  content: '✓';
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  background: var(--brand-blue);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.paymentCardIcon {
+  width: 48px;
+  height: 48px;
+  background: #f8f9fa;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  padding: 8px; /* Added padding for better icon breathing room */
+}
+
+.paymentCardIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.paymentCardActive .paymentCardIcon {
+  background: #fff;
+  color: var(--brand-blue);
+}
+
+.paymentCardContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.paymentCardTitle {
+  font-weight: 800;
+  font-size: 15px;
+  color: #1c1c1c;
+}
+
+.paymentCardSub {
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
+}
+
+.paymentCardPrice {
+  font-weight: 800;
+  font-size: 15px;
+  color: #1c1c1c;
+  margin-left: auto;
+  padding-right: 24px;
+}
+
+/* Order Summary (Right) */
+.summaryCard {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  position: sticky;
+  top: 100px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.sumTitle {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.itemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.orderItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.itemName {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.itemMeta {
+  font-size: 12px;
+  color: #888;
+}
+
+.itemPrice {
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.billDetails {
+  border-top: 1px dashed #eee;
+  padding-top: 24px;
+}
+
+.billDetails h4 {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 16px;
+}
+
+/* Coupon Section */
+.couponSection {
+  margin-bottom: 24px;
+  border: 1.5px dashed #3472ba20;
+  border-radius: 12px;
+  padding: 16px;
+  background: #f8fafc;
+}
+
+.couponTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.couponInputRow {
+  display: flex;
+  gap: 8px;
+}
+
+.couponInput {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: white;
+  transition: all 0.2s;
+}
+
+.couponInput:focus {
+  outline: none;
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px rgba(52, 114, 186, 0.1);
+}
+
+.couponInput:disabled {
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.applyBtn {
+  padding: 10px 16px;
+  background: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.applyBtn:hover:not(:disabled) {
+  background: #0f172a;
+}
+
+.applyBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.couponError {
+  font-size: 11px;
+  color: #ef4444;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+/* Free Gift Promo Styling */
+.giftBox {
+  margin-top: 20px;
+  padding: 14px;
+  background: #fff5f7;
+  border: 1px dashed #f9a8d4;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.giftEligible {
+  background: #f0fdf4;
+  border: 1.5px solid #10b981;
+  border-style: solid;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+}
+
+.giftIcon {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ec4899;
+  box-shadow: 0 4px 8px rgba(236, 72, 153, 0.1);
+}
+
+.giftEligible .giftIcon {
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.giftText {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.giftText strong {
+  font-size: 13px;
+  color: #1e293b;
+  display: block;
+  line-height: 1.2;
+}
+
+.giftText span {
+  font-size: 11px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.giftEligible .giftText strong {
+  color: #059669;
+}
+
+.giftGoBtn {
+  background: white;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0;
+}
+
+.giftGoBtn:hover {
+  background: #f8fafc;
+  color: #1e293b;
+}
+
+.couponSuccess {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.successText {
+  font-size: 12px;
+  color: #15803d;
+  font-weight: 700;
+}
+
+.removeCouponBtn {
+  background: none;
+  border: none;
+  color: #ef4444;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.couponSuggestion {
+  margin-top: 12px;
+  padding: 10px;
+  background: #fdf2f8; /* Light pink background */
+  border: 1px dashed #f472b6;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.suggestionText {
+  font-size: 11px;
+  color: #9d174d;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.suggestApplyBtn {
+  align-self: flex-start;
+  background: #be185d;
+  color: white;
+  border: none;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.savingsHighlight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: #15803d;
+  font-weight: 800;
+}
+
+
+
+.billRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.freeText {
+  color: var(--brand-blue);
+  font-weight: 800;
+}
+
+.grandTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1c1c1c;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.mainPlaceOrderBtn {
+  width: 100%;
+  margin-top: 24px;
+  padding: 16px;
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.23;
+}
+
+.mainPlaceOrderBtn:disabled {
+  opacity: 0.7;
+}
+
+.trustBanner {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+}
+
+.trustItem {
+  font-size: 11px;
+  font-weight: 700;
+  color: #666;
+}
+
+
+
+@media (max-width: 991px) {
+  .checkoutLayout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .rightColumn {
+    display: block; /* Restore visibility on mobile */
+    order: 2; /* Put summary after address/payment */
+  }
+
+  .leftColumn {
+    order: 1;
+    gap: 16px;
+  }
+
+  .summaryCard {
+    position: relative;
+    top: 0;
+    box-shadow: none;
+    border: 1px solid #eee;
+    padding: 16px;
+  }
+  
+
+  .container {
+    padding: 16px 12px 90px; /* Enough clearance above bottom nav */
+  }
+
+  .headerRow {
+    display: none !important;
+  }
+}
+
+
+
+/* Empty State */
+.emptyContainer {
+  min-height: 60vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.emptyContent {
+  text-align: center;
+}
+
+.startShoppingBtn {
+  background: var(--brand-blue);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  font-weight: 700;
+  margin-top: 20px;
+  cursor: pointer;
+}
+.startShoppingBtn:active {
+  transform: scale(0.98);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.8s linear infinite;
+}
+.discountText {
+  color: #dc2626;
+  font-weight: 800;
+}

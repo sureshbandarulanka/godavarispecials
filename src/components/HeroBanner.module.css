@@ -1,0 +1,159 @@
+.banner-section {
+  margin-top: 0;
+  width: 100%;
+}
+
+@media (max-width: 767px) {
+  .banner-section {
+    padding: 0 16px;
+    margin-top: 8px;
+  }
+}
+
+/* Maintain 3-column row on tablet and desktop */
+.banner-container {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.banner-card {
+  flex: 1;
+  position: relative;
+  aspect-ratio: 700 / 450;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: var(--bg-secondary);
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.banner-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.6s ease-in-out;
+  pointer-events: none;
+}
+
+.activeSlide {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bannerImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 60%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.contentOverlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.bannerInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bannerTitle {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  margin: 0;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+}
+
+.bannerSubtitle {
+  font-size: 12px;
+  color: rgba(255,255,255,0.9);
+  margin: 0;
+  font-weight: 500;
+}
+
+.ctaButton {
+  background-color: var(--brand-yellow);
+  color: #000;
+  font-size: 13px;
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.ctaButton:hover {
+  background-color: #e6b800;
+  transform: scale(1.05);
+}
+
+.dotsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+  padding-bottom: 0;
+}
+
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.activeDot {
+  background-color: #ffcc58;
+  width: 18px;
+  border-radius: 4px;
+}
+
+
+.loading-skeleton {
+    width: 100%;
+    aspect-ratio: 700 / 450;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 12px;
+}
+
+@keyframes skeleton-loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}

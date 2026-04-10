@@ -1,0 +1,497 @@
+:root {
+  /* Brand Colors (Extracted from Logo) */
+  --brand-yellow: #ffcc58;
+  --brand-yellow-hover: #ffb833;
+  --brand-blue: #3472BA;
+  --brand-blue-hover: #2B61A1;
+  --brand-green: var(--brand-blue);
+  --brand-green-hover: var(--brand-blue-hover);
+
+  /* UI Colors */
+  --bg-primary: #F8FAFC;
+  --bg-secondary: #FFFFFF;
+  --text-primary: #4A4A4A;
+  /* Softer charcoal matching "Specials.in" text */
+  --text-secondary: #64748B;
+  --text-inverse: #FFFFFF;
+  --border-color: #E2E8F0;
+
+  /* Status Colors */
+  --success: var(--brand-green);
+  --danger: #EF4444;
+  --warning: #F59E0B;
+
+  /* Shadows - Premium Soft */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.025);
+  --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --layout-max-width: 1280px;
+  --mobile-header-height: 110px;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  height: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.01));
+}
+
+/* Typography */
+.h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.text-bold {
+  font-weight: 600;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-sm {
+  font-size: 0.875rem;
+}
+
+.text-xs {
+  font-size: 0.75rem;
+}
+
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  /* 7xl */
+  margin: 0 auto;
+  padding: 16px 16px;
+  /* pt-4 px-4 */
+}
+
+.section {
+  margin-top: 16px;
+  /* Reduced from 24px */
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.gap-xs {
+  gap: var(--space-xs);
+}
+
+.gap-sm {
+  gap: var(--space-sm);
+}
+
+.gap-md {
+  gap: var(--space-md);
+}
+
+.gap-lg {
+  gap: var(--space-lg);
+}
+
+.w-full {
+  width: 100%;
+}
+
+.mt-sm {
+  margin-top: var(--space-sm);
+}
+
+.mt-md {
+  margin-top: var(--space-md);
+}
+
+.mb-sm {
+  margin-bottom: var(--space-sm);
+}
+
+.mb-md {
+  margin-bottom: var(--space-md);
+}
+
+/* Sections */
+.section {
+  padding: var(--space-sm) 0;
+  margin-bottom: var(--space-sm);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  gap: var(--space-sm);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary {
+  background-color: var(--brand-yellow);
+  color: #000;
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-yellow-hover);
+  box-shadow: 0 6px 16px rgba(250, 204, 21, 0.3);
+  transform: scale(1.02);
+}
+
+.btn-secondary {
+  background-color: var(--brand-blue);
+  color: var(--text-inverse);
+}
+
+.btn-secondary:hover {
+  background-color: var(--brand-blue-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-outline {
+  border: 1px solid var(--border-color);
+  background-color: transparent;
+  color: var(--text-primary);
+}
+
+.btn-outline:hover {
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
+  background-color: rgba(15, 23, 42, 0.05);
+}
+
+.btn-sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+}
+
+/* Cards */
+.card {
+  background-color: var(--bg-secondary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid #f1f1f1;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+}
+
+/* Shared shimmer animation (used by all skeleton components) */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 40%,
+    #f0f0f0 80%
+  );
+  background-size: 300% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeletonShimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* App shell fade-in (used by .app-shell in layout) */
+/* NOTE: No transform here — transform on a parent breaks position:fixed children */
+@keyframes appFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: appFadeIn 0.3s ease-out both;
+}
+
+.app-ready {
+  animation: appFadeIn 0.5s ease-in both;
+}
+
+@keyframes cartBounce {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.cart-bounce {
+  animation: cartBounce 0.4s ease;
+}
+
+.fly-image {
+  position: fixed;
+  z-index: 9999;
+  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+  background: white;
+  border-radius: 12px;
+}
+
+.added-to-cart {
+  border: 2px solid #22c55e !important;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.4) !important;
+  transition: 0.3s;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-danger {
+  background-color: var(--danger);
+  color: white;
+}
+
+.badge-warning {
+  background-color: var(--warning);
+  color: white;
+}
+
+.badge-success {
+  background-color: var(--success);
+  color: white;
+}
+
+/* Scrollbars */
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding-bottom: var(--space-sm);
+  padding-top: var(--space-xs);
+}
+
+.horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.horizontal-scroll>* {
+  scroll-snap-align: start;
+  flex: 0 0 auto;
+}
+
+/* Perfect Grid System */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+/* Mobile padding */
+/* Mobile padding override to prevent white space below footer */
+.pb-mobile-nav {
+  padding-bottom: 140px;
+}
+
+@media (max-width: 767px) {
+  .pb-mobile-nav {
+    padding-bottom: 80px;
+  }
+}
+
+@media (min-width: 768px) {
+  .pb-mobile-nav {
+    padding-bottom: 0;
+  }
+  /* Hide mobile-only elements on desktop */
+  .mobile-only {
+    display: none !important;
+  }
+}
+
+.main-content {
+  padding-top: 76px;
+  /* Header height (70px) + 6px buffer */
+}
+
+@media (max-width: 767px) {
+  .main-content {
+    padding-top: var(--mobile-header-height);
+  }
+}
+
+/* Premium UI Utilities */
+.premium-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  max-width: 600px;
+  margin: 40px auto;
+}
+
+.btn-login,
+.btn-shop {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 40px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  border: none;
+  gap: 8px;
+}
+
+.btn-login {
+  background: var(--brand-blue);
+  color: white;
+  box-shadow: 0 4px 15px rgba(52, 114, 186, 0.2);
+}
+
+.btn-login:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(52, 114, 186, 0.3);
+  background: var(--brand-blue-hover);
+}
+
+.btn-shop {
+  background: var(--brand-yellow);
+  color: #000;
+  box-shadow: 0 44px 15px rgba(255, 204, 88, 0.2);
+}
+
+.btn-shop:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(255, 204, 88, 0.3);
+  background: var(--brand-yellow-hover);
+}
+
+.btn-login:active,
+.btn-shop:active {
+  transform: scale(0.98);
+}

@@ -1,0 +1,261 @@
+.footer {
+  background: #ffcc58;
+  color: #333;
+  padding: 48px 24px 24px;
+  width: 100%;
+}
+
+.footerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 40px;
+  padding-bottom: 40px;
+}
+
+/* Column Styles */
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.footerLogo {
+  height: 52px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 16px;
+  align-self: flex-start;
+}
+
+.tagline {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.description {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.trustBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.trustBadge {
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.highlightLine {
+  font-size: 13px;
+  font-weight: 800;
+  color: #000;
+  margin-top: 8px;
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+}
+
+.heading {
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.links li a {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.links li a:hover {
+  text-decoration: underline;
+  color: #000;
+  transform: translateX(4px);
+  display: inline-block;
+}
+
+.contactDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.contactItem {
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deliveryScope {
+  font-size: 13px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+
+.socials {
+  display: flex;
+  gap: 16px;
+}
+
+.socialIcon {
+  background: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.socialIcon:hover {
+  transform: scale(1.1);
+}
+
+/* Bottom Strips */
+.bottomStrips {
+  border-top: 1px solid rgba(0,0,0,0.1);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding-top: 24px;
+}
+
+.paymentStrip {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.paymentIcons {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.paymentLogo {
+  font-size: 12px;
+  font-weight: 800;
+  color: #555;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.secureText {
+  font-size: 12px;
+  font-weight: 700;
+  color: #555;
+}
+
+.copyrightBar {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 991px) {
+  .footerContainer {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 600px) {
+  .footer {
+    padding: 32px 16px 120px; /* Internal padding to clear bottom nav */
+    text-align: left;
+  }
+
+  .footerContainer {
+    grid-template-columns: 1fr 1fr; /* Two columns side-by-side */
+    gap: 32px 16px;
+  }
+
+  /* Make first column (Brand) span full width */
+  .footerContainer > div:first-child {
+    grid-column: span 2;
+    margin-bottom: 8px;
+  }
+
+  .footerLogo {
+    align-self: flex-start;
+    height: 44px;
+  }
+
+  .trustBadges {
+    justify-content: flex-start;
+  }
+
+  .socials {
+    justify-content: flex-start;
+  }
+
+  .contactItem {
+    justify-content: flex-start;
+  }
+
+  .heading {
+    font-size: 15px;
+    margin-bottom: 15px;
+  }
+
+  .links li a {
+    font-size: 13px;
+  }
+
+  /* Compact Payment Strip */
+  .paymentStrip {
+    padding: 0 8px;
+    align-items: flex-start;
+  }
+
+  .paymentIcons {
+    justify-content: flex-start;
+    gap: 12px;
+  }
+
+  .copyrightBar {
+    text-align: left;
+    padding: 0 8px;
+  }
+}
