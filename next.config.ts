@@ -2,6 +2,23 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["jspdf", "fflate"],
+  compress: true,
+  poweredByHeader: false,
+  reactStrictMode: true,
+
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin-allow-popups', 
+          },
+        ],
+      },
+    ]
+  },
 
   images: {
     remotePatterns: [

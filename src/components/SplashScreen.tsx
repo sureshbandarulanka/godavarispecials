@@ -29,10 +29,10 @@ export default function SplashScreen() {
         const hideTimer = setTimeout(() => {
           setIsVisible(false);
           sessionStorage.setItem("mobile_splash_shown", "true");
-        }, 500);
+        }, 400); // Faster fade out
 
         return () => clearTimeout(hideTimer);
-      }, 2000);
+      }, 800); // Reduced from 2000ms
 
       return () => clearTimeout(fadeTimer);
     }

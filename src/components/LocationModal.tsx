@@ -21,12 +21,18 @@ export default function LocationModal({ isOpen, onClose }: { isOpen: boolean; on
   });
 
   const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
+  const sessionToken = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
   const placesService = useRef<google.maps.places.PlacesService | null>(null);
   const placesAttributionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isLoaded && !autocompleteService.current) {
-      autocompleteService.current = new google.maps.places.AutocompleteService();
+    if (isLoaded) {
+      if (!autocompleteService.current) {
+        autocompleteService.current = new google.maps.places.AutocompleteService();
+      }
+      if (!sessionToken.current) {
+        sessionToken.current = new google.maps.places.AutocompleteSessionToken();
+      }
     }
   }, [isLoaded]);
 
@@ -86,11 +92,14 @@ export default function LocationModal({ isOpen, onClose }: { isOpen: boolean; on
     // 2. GOOGLE AUTOCOMPLETE (India Restricted)
     if (autocompleteService.current && value.length > 2) {
       setIsSearching(true);
+      
+      // Use SessionToken as recommended for cost/performance in modern Places API
       autocompleteService.current.getPlacePredictions(
         {
           input: value,
           componentRestrictions: { country: "in" },
-          types: ["(cities)"]
+          types: ["(cities)"],
+          sessionToken: sessionToken.current || undefined
         },
         (predictions, status) => {
           setIsSearching(false);
@@ -124,7 +133,8 @@ export default function LocationModal({ isOpen, onClose }: { isOpen: boolean; on
     placesService.current.getDetails(
       { 
         placeId: suggestion.place_id,
-        fields: ['geometry', 'address_components']
+        fields: ['geometry', 'address_components'],
+        sessionToken: sessionToken.current || undefined
       },
       (place, status) => {
         setIsSearching(false);
@@ -141,6 +151,9 @@ export default function LocationModal({ isOpen, onClose }: { isOpen: boolean; on
               state = comp.long_name;
             }
           });
+
+          // Refresh session token for next search interaction
+          sessionToken.current = new google.maps.places.AutocompleteSessionToken();
 
           updateLocation({
             city: suggestion.structured_formatting.main_text,
