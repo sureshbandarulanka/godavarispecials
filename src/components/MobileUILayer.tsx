@@ -16,22 +16,12 @@ import MobileCategories from "./MobileCategories";
  * a pixel-perfect shimmer skeleton is shown instead, eliminating CLS.
  */
 export default function MobileUILayer() {
-  const mounted = useClientMount();
   const pathname = usePathname();
 
   const isHomePage = pathname === "/";
   const isCategoryPage = pathname.startsWith("/category/");
   const showMobileCategories = isHomePage || isCategoryPage;
   const showMobileBanners = isHomePage;
-
-  // Show a pixel-perfect header skeleton during pre-hydration to avoid CLS
-  if (!mounted) {
-    return (
-      <div className="mobile-skeleton-shell">
-        <MobileHeaderSkeleton />
-      </div>
-    );
-  }
 
   return (
     <>

@@ -22,7 +22,7 @@
 
   /* Policy/info pages have inline style padding that overrides — reset to mobile values */
   .pb-mobile-nav .main-content[style] {
-    padding-top: 20px !important;
+    padding-top: 0 !important;
     padding-bottom: 160px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
@@ -567,118 +567,64 @@
     font-weight: 800;
   }
 
-  /* =========================================
-     MAGIC NAVIGATION MENU 3
-     ========================================= */
-  .magic-navigation {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 70px;
-    background: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: 10px 10px 0 0;
-    z-index: 2000;
-    box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+  /* --- Bottom Navbar: sticky fix + safe-area --- */
+  .mobile-bottom-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    /* Lift above web browser chrome on iOS/Android */
+    padding-bottom: env(safe-area-inset-bottom, 8px);
+    padding-top: 8px;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    display: flex !important;
+    justify-content: space-around;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.07);
+    z-index: 999 !important;
+    border-radius: 20px 20px 0 0;
+    /* Ensure it is never displaced by transforms */
+    transform: none !important;
+    will-change: auto !important;
   }
 
-  .magic-nav-list {
+  .nav-item {
     display: flex;
-    width: 350px;
-    position: relative;
-    padding: 0;
-    margin: 0;
-    list-style: none;
-  }
-
-  .magic-list-item {
-    position: relative;
-    width: 70px;
-    height: 70px;
-    z-index: 1;
-  }
-
-  .magic-item-link {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
-    width: 100%;
-    text-align: center;
-    font-weight: 500;
+    align-items: center;
+    gap: 3px;
+    color: #8a8a8a;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    flex: 1;
+    padding: 2px 0;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  .magic-icon {
-    position: relative;
-    display: block;
-    line-height: 75px;
-    font-size: 1.5em;
-    text-align: center;
-    transition: 0.5s;
-    color: #333;
-    z-index: 2;
+  .nav-item.active {
+    color: #fecc58;
   }
 
-  .magic-list-item.active .magic-icon {
-    transform: translateY(-32px);
-    color: #fff;
-  }
-
-  .magic-text {
-    position: absolute;
-    color: #333;
+  .nav-label {
+    font-size: 9.5px;
     font-weight: 700;
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    transition: 0.5s;
-    opacity: 0;
-    transform: translateY(20px);
-    text-transform: uppercase;
+    letter-spacing: -0.2px;
   }
 
-  .magic-list-item.active .magic-text {
-    opacity: 1;
-    transform: translateY(10px);
+  .nav-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 22px;
+    transition: transform 0.15s ease;
   }
 
-  .magic-indicator {
-    position: absolute;
-    top: -50%;
-    width: 70px;
-    height: 70px;
-    background: #fecc58;
-    border-radius: 50%;
-    border: 6px solid #fff;
-    transition: 0.5s;
-  }
-
-  .magic-indicator::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: -22px;
-    width: 20px;
-    height: 20px;
-    background: transparent;
-    border-top-right-radius: 20px;
-    box-shadow: 1px -10px 0 0 #fff;
-  }
-
-  .magic-indicator::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: -22px;
-    width: 20px;
-    height: 20px;
-    background: transparent;
-    border-top-left-radius: 20px;
-    box-shadow: -1px -10px 0 0 #fff;
+  .nav-item:active .nav-icon {
+    transform: scale(0.88);
   }
 
   /* Categories Grid Page */

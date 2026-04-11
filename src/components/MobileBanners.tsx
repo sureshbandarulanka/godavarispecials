@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { subscribeToActiveBanners, Banner } from '@/services/bannerService';
 
 const FALLBACK_MOBILE_BANNERS = [
@@ -98,16 +97,9 @@ export default function MobileBanners() {
             key={banner.id} 
             className="banner-card" 
             onClick={() => handleBannerClick(banner)}
-            style={{ cursor: 'pointer', position: 'relative' }}
+            style={{ cursor: 'pointer' }}
           >
-            <Image 
-              src={banner.imageUrl} 
-              alt={banner.title || 'Banner'} 
-              fill
-              priority
-              style={{ objectFit: 'cover' }}
-              sizes="100vw"
-            />
+            <img src={banner.imageUrl} alt={banner.title} loading="lazy" />
             <div className="banner-overlay">
               <button 
                 className="banner-order-btn"
