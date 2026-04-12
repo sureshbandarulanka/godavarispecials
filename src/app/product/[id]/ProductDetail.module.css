@@ -46,8 +46,9 @@
 .mainImage {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   transition: transform 0.3s ease;
+  padding: 0;
 }
 
 .mainImage:hover {
@@ -500,9 +501,14 @@
   }
 
   .mainImageContainer {
-    aspect-ratio: 1 / 1 !important;
+    aspect-ratio: 1 / 0.8 !important; /* Reduced height (wider rectangle) */
     width: 100% !important;
     height: auto !important;
+    min-height: auto !important;
+    padding: 0 !important; /* Spread fully to edges */
+    margin-bottom: 8px;
+    border-radius: 12px;
+    overflow: hidden;
   }
 
   .scrollContainer {

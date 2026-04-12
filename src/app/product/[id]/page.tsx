@@ -186,7 +186,6 @@ export default function ProductDetailPage() {
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className={styles.mainImage} 
-                  style={{ objectFit: 'cover' }}
                 />
               ) : (
                 <div className={styles.noImageLarge}>
