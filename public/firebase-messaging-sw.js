@@ -13,10 +13,10 @@ const messaging = firebase.messaging();
 
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = "Godavari Specials";
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/next.svg' // Placeholder - User should check if they have a /logo.png
+    body: payload.notification?.body || "Pickles at your Door Step",
+    icon: '/assets/favicon.png'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

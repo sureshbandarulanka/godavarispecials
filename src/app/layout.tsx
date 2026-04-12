@@ -31,45 +31,31 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://godavarispecials.in'),
-  title: {
-    default: "Godavari Specials - Fresh Local Products Delivery",
-    template: "%s | Godavari Specials"
+  title: "Godavari Specials",
+  description: "Authentic Homemade Foods",
+  icons: {
+    icon: "/assets/favicon.png",
+    shortcut: "/assets/favicon.png",
+    apple: "/assets/favicon.png"
   },
-  description: "Order fresh and authentic Godavari special products online. Fast delivery, best quality groceries, snacks, and local items delivered to your doorstep.",
-  keywords: ["Godavari specials", "godavarispecials", "godavari specials", "gs", "godavari foods", "online groceries Andhra Pradesh", "local products delivery", "Rajahmundry food delivery", "East Godavari snacks", "fresh groceries online India"],
+  manifest: "/manifest.json",
   authors: [{ name: "Godavari Specials" }],
   creator: "Godavari Specials",
   publisher: "Godavari Specials",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
-    title: "Godavari Specials - Fresh Local Products Delivery",
-    description: "Order fresh and authentic Godavari special products online. Fast delivery, best quality groceries, snacks, and local items delivered to your doorstep.",
+    title: "Godavari Specials",
+    description: "Authentic Homemade Foods",
     url: 'https://godavarispecials.in',
     siteName: 'Godavari Specials',
-    images: [
-      {
-        url: '/api/og', 
-        width: 1200,
-        height: 630,
-        alt: 'Godavari Specials - Authentic Homemade Foods',
-      },
-    ],
+    images: [{ url: '/assets/favicon.png' }],
     locale: 'en_IN',
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Godavari Specials - Fresh Local Products Delivery",
-    description: "Order fresh and authentic Godavari special products online. Fast delivery, best quality groceries, snacks, and local items delivered to your doorstep.",
-    creator: '@godavarispecials',
-    images: ['/og-image.jpg'], 
+    title: "Godavari Specials",
+    description: "Authentic Homemade Foods",
+    images: ['/assets/favicon.png'],
   },
   verification: {
     google: "9WwBS1zr9-5RZ-bFjgAlYkybwMcUSRiBhweegs4p0fs",
@@ -84,10 +70,6 @@ export const metadata: Metadata = {
       'max-image-preview': 'large',
       'max-snippet': -1,
     },
-  },
-  icons: {
-    icon: '/icon.png',
-    apple: '/apple-icon.png',
   },
 };
 
@@ -113,7 +95,6 @@ export default function RootLayout({
         <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://firebasestorage.googleapis.com" />
         <link rel="dns-prefetch" href="https://ipapi.co" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
