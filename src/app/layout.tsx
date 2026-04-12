@@ -21,6 +21,7 @@ import AutoLoginPrompt from "@/components/AutoLoginPrompt";
 import NotificationPrompt from "@/components/NotificationPrompt";
 import LocationPrompt from "@/components/LocationPrompt";
 import AppStateProvider from "@/components/AppStateProvider";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 // Load Inter with font-display: swap to avoid FOIT (Flash of Invisible Text)
 const inter = Inter({
@@ -142,6 +143,7 @@ export default function RootLayout({
             </CartProvider>
           </LocationProvider>
         </AuthProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
