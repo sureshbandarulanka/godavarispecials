@@ -13,6 +13,7 @@ export interface User {
   phone: string | null;
   photoURL: string | null;
   role: "user" | "admin";
+  dob?: string;
 }
 
 interface AuthContextType {
@@ -45,9 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           uid: firebaseUser.uid,
           name: firebaseUser.displayName || 'User',
           email: firebaseUser.email,
-          phone: firebaseUser.phoneNumber,
+          phone: firebaseUser.phoneNumber || userData.phone,
           photoURL: firebaseUser.photoURL,
           role: userData.role || 'user',
+          dob: userData.dob,
         });
       } else {
         setUser(null);

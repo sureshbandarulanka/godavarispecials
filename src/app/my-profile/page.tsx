@@ -20,6 +20,7 @@ export default function MyProfilePage() {
     name: '',
     email: '',
     phone: '',
+    dob: '',
     address: ''
   });
   
@@ -32,7 +33,8 @@ export default function MyProfilePage() {
         ...prev,
         name: user.name || '',
         email: user.email || '',
-        phone: user.phone || ''
+        phone: user.phone || '',
+        dob: user.dob || ''
       }));
     }
   }, [user]);
@@ -63,13 +65,29 @@ export default function MyProfilePage() {
     setIsSaved(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a full implementation, we'd update Firestore here. 
-    // For now, our Auth system syncs on login.
-    showToast("Profile updates are currently managed via login providers.");
-    setIsSaved(true);
-    setTimeout(() => setIsSaved(false), 3000);
+    if (!user) return;
+
+    try {
+      const { doc, updateDoc } = await import('firebase/firestore');
+      const { db } = await import('@/lib/firebase');
+      const userRef = doc(db, 'users', user.uid);
+      
+      await updateDoc(userRef, {
+        displayName: formData.name,
+        phone: formData.phone,
+        dob: formData.dob,
+        detailedAddress: formData.address
+      });
+
+      showToast("Profile updated successfully! ✨");
+      setIsSaved(true);
+      setTimeout(() => setIsSaved(false), 3000);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      showToast("Failed to update profile. Please try again.");
+    }
   };
 
   if (!isClient) return null;
@@ -135,6 +153,16 @@ export default function MyProfilePage() {
                       className={styles.input}
                     />
                   </div>
+                  <div className={styles.formGroup}>
+                    <label>Date of Birth</label>
+                    <input 
+                      type="date" 
+                      name="dob" 
+                      value={formData.dob} 
+                      onChange={handleChange} 
+                      className={styles.input}
+                    />
+                  </div>
                 </div>
 
                 <div className={styles.sectionTitle}>Delivery Address</div>
@@ -188,8 +216,20 @@ export default function MyProfilePage() {
             </div>
             <h2 className="profile-name-large">{formData.name}</h2>
             <div className="profile-meta-row">
-              <span className="profile-phone-large">📞 {formData.phone || '9618070847'}</span>
-              <span className="profile-dob-large">🎂 07 Dec 1994</span>
+              {formData.phone ? (
+                <span className="profile-phone-large">📞 {formData.phone}</span>
+              ) : (
+                <span className="profile-add-info-btn" onClick={() => (document.getElementsByName('phone')[0] as HTMLElement)?.focus()}>
+                  Add Phone Number
+                </span>
+              )}
+              {formData.dob ? (
+                <span className="profile-dob-large">🎂 {new Date(formData.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
+              ) : (
+                <span className="profile-add-info-btn" onClick={() => (document.getElementsByName('dob')[0] as HTMLElement)?.focus()}>
+                  Add Date of Birth
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -494,7 +494,15 @@ export default function CheckoutPage() {
                   <button className={styles.addBtn} onClick={() => {
                     setIsFormOpen(true);
                     setEditingAddressId(null);
-                    setFormData({ name: user?.name || '', phone: user?.phone || '', email: '', address1: '', address2: '', city: 'Rajahmundry', pincode: '' });
+                    setFormData({ 
+                      name: user?.name || '', 
+                      phone: user?.phone || '', 
+                      email: user?.email || '', 
+                      address1: '', 
+                      address2: '', 
+                      city: location?.city || 'Rajahmundry', 
+                      pincode: location?.pincode || '' 
+                    });
                   }}>+ Add New</button>
                 )}
               </div>

@@ -18,6 +18,7 @@ export interface UserData {
   photoURL: string | null;
   role: "user" | "admin";
   city?: string;
+  dob?: string;
   categoryPreference?: string[];
   fcmTokens?: string[];
   createdAt: any;
@@ -70,7 +71,9 @@ export const syncUserToFirestore = async (user: FirebaseUser) => {
     await setDoc(userRef, userData, { merge: true });
   }
 
-  return userData as UserData;
+  // Fetch final merged data to return
+  const finalSnap = await getDoc(userRef);
+  return finalSnap.data() as UserData;
 };
 
 /**
