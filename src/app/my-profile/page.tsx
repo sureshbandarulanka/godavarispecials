@@ -8,6 +8,7 @@ import { useLocation } from '@/context/LocationContext';
 import { useRouter } from 'next/navigation';
 import styles from './MyProfile.module.css';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import EditProfileModal from '@/components/EditProfileModal';
 
 export default function MyProfilePage() {
   const { user, logout } = useAuth();
@@ -25,6 +26,8 @@ export default function MyProfilePage() {
   });
   
   const [isSaved, setIsSaved] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -69,6 +72,7 @@ export default function MyProfilePage() {
     e.preventDefault();
     if (!user) return;
 
+    setIsSubmitting(true);
     try {
       const { doc, updateDoc } = await import('firebase/firestore');
       const { db } = await import('@/lib/firebase');
@@ -87,6 +91,8 @@ export default function MyProfilePage() {
     } catch (error) {
       console.error("Error updating profile:", error);
       showToast("Failed to update profile. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -210,27 +216,23 @@ export default function MyProfilePage() {
             </svg>
           </button>
           
-          <div className="profile-identity">
+          <div className="profile-identity" onClick={() => setIsEditModalOpen(true)}>
             <div className="profile-avatar-large">
-              {formData.name.charAt(0).toUpperCase()}
+              {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
             </div>
-            <h2 className="profile-name-large">{formData.name}</h2>
+            <h2 className="profile-name-large">{formData.name || 'Set your name'}</h2>
             <div className="profile-meta-row">
-              {formData.phone ? (
-                <span className="profile-phone-large">📞 {formData.phone}</span>
-              ) : (
-                <span className="profile-add-info-btn" onClick={() => (document.getElementsByName('phone')[0] as HTMLElement)?.focus()}>
-                  Add Phone Number
-                </span>
-              )}
-              {formData.dob ? (
-                <span className="profile-dob-large">🎂 {new Date(formData.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
-              ) : (
-                <span className="profile-add-info-btn" onClick={() => (document.getElementsByName('dob')[0] as HTMLElement)?.focus()}>
-                  Add Date of Birth
+              {formData.phone && <span className="profile-meta-item">📞 {formData.phone}</span>}
+              {formData.dob && (
+                <span className="profile-meta-item">
+                  🎂 {new Date(formData.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </span>
               )}
             </div>
+            
+            <button className="update-profile-btn" onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}>
+              Update Profile
+            </button>
           </div>
         </div>
 
@@ -395,6 +397,14 @@ export default function MyProfilePage() {
         </div>
       </div>
     </div>
+    <EditProfileModal 
+      isOpen={isEditModalOpen} 
+      onClose={() => setIsEditModalOpen(false)}
+      formData={formData}
+      onChange={handleChange}
+      onSubmit={handleSubmit}
+      loading={isSubmitting}
+    />
     </ProtectedRoute>
   );
 }

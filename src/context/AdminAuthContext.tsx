@@ -56,16 +56,24 @@ export function AdminAuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, pass: string) => {
-    // 💡 Standard Firebase login
-    const credential = await signInWithEmailAndPassword(auth, email, pass);
-    
-    // 🛡️ Security: Verify admin role in Firestore
-    const userRef = doc(db, "users", credential.user.uid);
-    const userSnap = await getDoc(userRef);
-    const userData = userSnap.data();
+    try {
+      // 💡 Standard Firebase login
+      const credential = await signInWithEmailAndPassword(auth, email, pass);
+      
+      // 🛡️ Security: Verify admin role in Firestore
+      const userRef = doc(db, "users", credential.user.uid);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.data();
 
-    if (!userData || userData.role !== 'admin') {
-      throw new Error('Access Denied: You do not have administrator privileges.');
+      if (!userData || userData.role !== 'admin') {
+        // If they are a valid user but not an admin, we MUST log them out 
+        // from the admin context to prevent partial sessions.
+        await signOut(auth);
+        throw new Error('Access Denied: Your account does not have administrator privileges.');
+      }
+    } catch (error: any) {
+      // Re-throw to be caught by the login page UI
+      throw error;
     }
   };
 

@@ -233,6 +233,11 @@ export default function Header() {
                 </button>
                 {isUserDropdownOpen && (
                   <div className={styles.userDropdown}>
+                    {user.role === 'admin' && (
+                      <Link href="/admin" className={styles.dropdownItem} style={{ color: 'var(--brand-blue)', fontWeight: 'bold' }} onClick={() => setIsUserDropdownOpen(false)}>
+                        🛡️ Admin Dashboard
+                      </Link>
+                    )}
                     <Link href="/my-orders" className={styles.dropdownItem} onClick={() => setIsUserDropdownOpen(false)}>My Orders</Link>
                     <Link href="/my-profile" className={styles.dropdownItem} onClick={() => setIsUserDropdownOpen(false)}>My Profile</Link>
                     <button className={styles.dropdownItem} onClick={() => { logout(); setIsUserDropdownOpen(false); router.push('/'); }}>Logout</button>
