@@ -22,6 +22,7 @@ import NotificationPrompt from "@/components/NotificationPrompt";
 import LocationPrompt from "@/components/LocationPrompt";
 import AppStateProvider from "@/components/AppStateProvider";
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
 // Load Inter with font-display: swap to avoid FOIT (Flash of Invisible Text)
 const inter = Inter({
@@ -144,6 +145,7 @@ export default function RootLayout({
           </LocationProvider>
         </AuthProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   );
