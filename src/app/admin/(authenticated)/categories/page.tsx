@@ -2,14 +2,139 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { deleteCategory, isCategoryInUse } from '@/services/productService';
+import { deleteCategory, isCategoryInUse, updateCategoryOrder } from '@/services/productService';
 import { useCategories } from '@/context/CategoryContext';
+import { 
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  useSortable
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Sortable Row Component
+function SortableRow({ cat, onInitiateDelete }: { cat: any, onInitiateDelete: (id: string, name: string) => void }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging
+  } = useSortable({ id: cat.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 1 : 0,
+    position: 'relative' as const,
+    background: isDragging ? '#f8fafc' : undefined,
+    boxShadow: isDragging ? '0 5px 15px rgba(0,0,0,0.1)' : undefined,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style}>
+      <td>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div 
+            {...attributes} 
+            {...listeners} 
+            style={{ 
+              cursor: 'grab', 
+              color: '#94a3b8', 
+              display: 'flex', 
+              alignItems: 'center',
+              padding: '4px'
+            }}
+            title="Drag to reorder"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="12" r="1"></circle><circle cx="9" cy="5" r="1"></circle><circle cx="9" cy="19" r="1"></circle><circle cx="15" cy="12" r="1"></circle><circle cx="15" cy="5" r="1"></circle><circle cx="15" cy="19" r="1"></circle></svg>
+          </div>
+          <div style={{ fontWeight: 600 }}>{cat.name}</div>
+        </div>
+      </td>
+      <td>
+        <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>{cat.slug}</code>
+      </td>
+      <td>
+        <div className="actions-cell">
+          <button 
+            className="btn-icon delete" 
+            title="Delete"
+            onClick={() => onInitiateDelete(cat.id, cat.name)}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+          </button>
+        </div>
+      </td>
+    </tr>
+  );
+}
 
 export default function AdminCategoriesPage() {
-  const { categories, loading } = useCategories();
+  const { categories: contextCategories, loading } = useCategories();
+  const [categories, setCategories] = useState<any[]>([]);
   const [deleteData, setDeleteData] = useState<{ id: string, name: string, inUse: boolean } | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (contextCategories.length > 0) {
+      setCategories(contextCategories);
+    }
+  }, [contextCategories]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      setCategories((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        
+        const newItems = arrayMove(items, oldIndex, newIndex);
+        setHasChanges(true);
+        return newItems;
+      });
+    }
+  };
+
+  const saveOrder = async () => {
+    setSavingOrder(true);
+    try {
+      await updateCategoryOrder(categories.map(c => c.id));
+      setToast('Order saved successfully!');
+      setHasChanges(false);
+      setTimeout(() => setToast(null), 3000);
+    } catch (error) {
+      alert('Failed to save order');
+    } finally {
+      setSavingOrder(false);
+    }
+  };
 
   const handleDelete = async () => {
     if (!deleteData) return;
@@ -35,14 +160,26 @@ export default function AdminCategoriesPage() {
     <div className="admin-page">
       <div className="admin-card">
         <div className="admin-card-header">
-          <h2 className="admin-card-title">Categories ({categories.length})</h2>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <h2 className="admin-card-title">Categories ({categories.length})</h2>
+            {hasChanges && (
+              <button 
+                className="btn-primary" 
+                onClick={saveOrder}
+                disabled={savingOrder}
+                style={{ padding: '6px 16px', fontSize: '14px', background: '#10b981' }}
+              >
+                {savingOrder ? 'Saving...' : 'Save New Order'}
+              </button>
+            )}
+          </div>
           <Link href="/admin/categories/add" className="btn-primary">
             + Add Category
           </Link>
         </div>
 
         <div className="admin-table-container">
-          {loading ? (
+          {loading && categories.length === 0 ? (
             <div className="admin-empty">
               <div style={{ width: '40px', height: '40px', border: '3px solid #f3f3f3', borderTop: '3px solid #3b82f6', borderRadius: '50%', animation: 'spin 1s linear infinite', margin: '0 auto' }}></div>
               <p style={{ marginTop: '16px', color: '#64748b' }}>Loading categories...</p>
@@ -56,38 +193,35 @@ export default function AdminCategoriesPage() {
               <Link href="/admin/categories/add" className="btn-primary">Add Category</Link>
             </div>
           ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Slug</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {categories.map((cat) => (
-                  <tr key={cat.id}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{cat.name}</div>
-                    </td>
-                    <td>
-                      <code style={{ background: '#f1f5f9', padding: '2px 6px', borderRadius: '4px', fontSize: '12px' }}>{cat.slug}</code>
-                    </td>
-                    <td>
-                      <div className="actions-cell">
-                        <button 
-                          className="btn-icon delete" 
-                          title="Delete"
-                          onClick={() => initiateDelete(cat.id, cat.name)}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
-                      </div>
-                    </td>
+            <DndContext 
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th>Actions</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  <SortableContext 
+                    items={categories.map(c => c.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {categories.map((cat) => (
+                      <SortableRow 
+                        key={cat.id} 
+                        cat={cat} 
+                        onInitiateDelete={initiateDelete} 
+                      />
+                    ))}
+                  </SortableContext>
+                </tbody>
+              </table>
+            </DndContext>
           )}
         </div>
       </div>

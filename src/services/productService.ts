@@ -69,12 +69,33 @@ export const getProducts = (): Product[] => {
 // 🔥 CATEGORY CRUD OPERATIONS
 
 // ✅ Add Category
-export const addCategory = async (category: { name: string, slug: string, imageUrl?: string }) => {
+export const addCategory = async (category: { name: string, slug: string, imageUrl?: string, order?: number }) => {
   try {
-    const docRef = await addDoc(collection(db, "categories"), category);
+    // If order is not provided, we should ideally put it at the end
+    // But for simplicity, we'll let the context sorting handle it or 
+    // the caller can provide it.
+    const docRef = await addDoc(collection(db, "categories"), {
+      ...category,
+      createdAt: serverTimestamp()
+    });
     return docRef.id;
   } catch (error) {
     console.error("Error adding category:", error);
+    throw error;
+  }
+};
+
+// ✅ Update Category Order
+export const updateCategoryOrder = async (orderedIds: string[]) => {
+  try {
+    const batch = writeBatch(db);
+    orderedIds.forEach((id, index) => {
+      const docRef = doc(db, "categories", id);
+      batch.update(docRef, { order: index });
+    });
+    await batch.commit();
+  } catch (error) {
+    console.error("Error updating category order:", error);
     throw error;
   }
 };

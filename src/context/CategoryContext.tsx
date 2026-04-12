@@ -10,6 +10,7 @@ export interface Category {
   slug: string;
   imageUrl?: string;
   tag?: string;
+  order?: number;
   createdAt?: any;
 }
 
@@ -28,6 +29,7 @@ export const CategoryProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     // Listen to changes in the "categories" collection
+    // We order by name as a fallback because orderBy filters out docs missing the field
     const q = query(collection(db, "categories"), orderBy("name", "asc"));
     
     const unsubscribe = onSnapshot(
@@ -37,6 +39,17 @@ export const CategoryProvider = ({ children }: { children: React.ReactNode }) =>
           id: doc.id,
           ...doc.data()
         } as Category));
+        
+        // Custom sort to prioritize 'order' field
+        catList.sort((a, b) => {
+          if (a.order !== undefined && b.order !== undefined) {
+            return a.order - b.order;
+          }
+          if (a.order !== undefined) return -1;
+          if (b.order !== undefined) return 1;
+          return a.name.localeCompare(b.name);
+        });
+
         setCategories(catList);
         setLoading(false);
       },
