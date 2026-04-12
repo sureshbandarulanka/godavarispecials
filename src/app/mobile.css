@@ -602,7 +602,6 @@
     flex: 1;
     padding: 2px 0;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
   }
 
   .nav-item.active {
@@ -624,7 +623,7 @@
   }
 
   .nav-item:active .nav-icon {
-    transform: scale(0.88);
+    transform: scale(0.9);
   }
 
   /* Categories Grid Page */
@@ -667,7 +666,6 @@
   }
 
   .category-tile:active {
-    transform: scale(0.96);
     background: #fcfcfc;
   }
 
@@ -1117,13 +1115,11 @@
 
   /* Mobile-specific Interactions */
   .category-item:active {
-    transform: scale(0.92);
     transition: transform 0.1s ease;
   }
 
   .mobile-header-actions button:active,
   .mobile-bottom-nav .nav-item:active {
-    transform: scale(0.9);
     transition: transform 0.1s ease;
   }
 
