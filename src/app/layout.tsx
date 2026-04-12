@@ -32,11 +32,11 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://godavarispecials.in'),
   title: {
-    default: "Godavari Specials - Authentic Homemade Pickles & Traditional Foods",
+    default: "Godavari Specials - Fresh Local Products Delivery",
     template: "%s | Godavari Specials"
   },
-  description: "Experience the authentic taste of Godavari. Pure, homemade pickles, traditional sweets, dry fish, and spices delivered fresh from Rajahmundry to your doorstep worldwide.",
-  keywords: ["Godavari Specials", "Authentic Pickles", "Homemade Foods", "Andhra Pickles", "Rajahmundry Sweets", "Dry Fish Online", "Pure Ghee", "Traditional Indian Spices"],
+  description: "Order fresh and authentic Godavari special products online. Fast delivery, best quality groceries, snacks, and local items delivered to your doorstep.",
+  keywords: ["Godavari specials", "godavarispecials", "godavari specials", "gs", "godavari foods", "online groceries Andhra Pradesh", "local products delivery", "Rajahmundry food delivery", "East Godavari snacks", "fresh groceries online India"],
   authors: [{ name: "Godavari Specials" }],
   creator: "Godavari Specials",
   publisher: "Godavari Specials",
@@ -49,13 +49,13 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: "Godavari Specials - Authentic Homemade Pickles & Traditional Foods",
-    description: "Pure, homemade pickles and traditional Godavari flavors delivered fresh to your doorstep.",
+    title: "Godavari Specials - Fresh Local Products Delivery",
+    description: "Order fresh and authentic Godavari special products online. Fast delivery, best quality groceries, snacks, and local items delivered to your doorstep.",
     url: 'https://godavarispecials.in',
     siteName: 'Godavari Specials',
     images: [
       {
-        url: '/api/og', // Will create this or use static image
+        url: '/api/og', 
         width: 1200,
         height: 630,
         alt: 'Godavari Specials - Authentic Homemade Foods',
@@ -66,10 +66,13 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Godavari Specials - Authentic Homemade Foods",
-    description: "Pure, homemade pickles and traditional Godavari flavors delivered fresh to your doorstep.",
+    title: "Godavari Specials - Fresh Local Products Delivery",
+    description: "Order fresh and authentic Godavari special products online. Fast delivery, best quality groceries, snacks, and local items delivered to your doorstep.",
     creator: '@godavarispecials',
-    images: ['/og-image.jpg'], // Fallback to static
+    images: ['/og-image.jpg'], 
+  },
+  verification: {
+    google: "9WwBS1zr9-5RZ-bFjgAlYkybwMcUSRiBhweegs4p0fs",
   },
   robots: {
     index: true,
