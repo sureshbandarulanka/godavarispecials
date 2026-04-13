@@ -7,10 +7,10 @@
     padding-top: 0;
   }
 
-  /* Fix: Policy/Info pages lo Header tarvata empty space remove cheyyadaniki
-     inline style padding-top: 120px override chestunam (desktop header hidden on mobile) */
+  /* Fix: Policy/Info pages lo Header tarvata content header kindhaki vellipokunda 
+     padding-top: 140px set chestunam (mobile header is sticky) */
   .pb-mobile-nav .main-content {
-    padding-top: 20px !important;
+    padding-top: 140px !important;
     /* Ensure content is not hidden behind fixed bottom nav bar (≈65px tall) */
     padding-bottom: 160px !important;
   }
@@ -22,7 +22,7 @@
 
   /* Policy/info pages have inline style padding that overrides — reset to mobile values */
   .pb-mobile-nav .main-content[style] {
-    padding-top: 0 !important;
+    padding-top: 140px !important;
     padding-bottom: 160px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;

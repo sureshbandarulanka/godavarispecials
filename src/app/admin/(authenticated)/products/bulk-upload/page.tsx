@@ -168,16 +168,20 @@ export default function BulkUploadPage() {
         }
       }
 
-      // 3. Robust Alphanumeric Image Mapping
+      // 3. Robust Alphanumeric Image Mapping (Supports multiple comma-separated images)
       if (row.imageName) {
-        const searchKey = normalize(row.imageName);
-        if (!imageMap.has(searchKey)) {
-          newErrors.push({ 
-            row: rowNum, 
-            message: `Image "${row.imageName}" not found. (Search Key: ${searchKey})`, 
-            type: 'error' 
-          });
-        }
+        const imageNames = row.imageName.toString().split(',').map(s => s.trim()).filter(Boolean);
+        
+        imageNames.forEach(name => {
+          const searchKey = normalize(name);
+          if (!imageMap.has(searchKey)) {
+            newErrors.push({ 
+              row: rowNum, 
+              message: `Image "${name}" not found. (Search Key: ${searchKey})`, 
+              type: 'error' 
+            });
+          }
+        });
       }
 
       // 4. Date Validation
@@ -222,10 +226,13 @@ export default function BulkUploadPage() {
     const internalErrors: string[] = [];
     data.forEach((item, idx) => {
       if (item.imageName) {
-        const searchKey = normalize(item.imageName);
-        if (!imageMap[searchKey]) {
-          internalErrors.push(`Row ${idx + 2}: Image "${item.imageName}" mapping key "${searchKey}" not found.`);
-        }
+        const imageNames = item.imageName.toString().split(',').map(s => s.trim()).filter(Boolean);
+        imageNames.forEach(name => {
+          const searchKey = normalize(name);
+          if (!imageMap[searchKey]) {
+            internalErrors.push(`Row ${idx + 2}: Image "${name}" mapping key "${searchKey}" not found.`);
+          }
+        });
       }
     });
 
@@ -248,27 +255,37 @@ export default function BulkUploadPage() {
         
         await Promise.all(chunk.map(async (item, index) => {
           let imageUrl = "";
+          let imageUrls: string[] = [];
           
-          // 1. Handle Image if present (Internal lookup)
-          const searchKey = normalize(item.imageName);
-          const imageFile = imageMap[searchKey];
+          // 1. Handle Images if present (Internal lookup)
+          if (item.imageName) {
+            const requestedNames = item.imageName.toString().split(',').map(s => s.trim()).filter(Boolean);
+            
+            for (const name of requestedNames) {
+              const searchKey = normalize(name);
+              const imageFile = imageMap[searchKey];
 
-          if (item.imageName && !imageFile) {
-             console.error("Mismatch:", item.imageName);
-             return;
+              if (!imageFile) {
+                console.error("Mismatch:", name);
+                continue;
+              }
+
+              // Compress
+              setStatus(`Compressing ${imageFile.name}...`);
+              const compressedFile = await compressImage(imageFile);
+              
+              // Upload to Storage
+              setStatus(`Uploading ${imageFile.name}...`);
+              const storagePath = `products/${Date.now()}_${compressedFile.name}`;
+              const storageRef = ref(storage, storagePath);
+              const snapshot = await uploadBytes(storageRef, compressedFile);
+              const url = await getDownloadURL(snapshot.ref);
+              imageUrls.push(url);
+            }
           }
 
-          if (imageFile) {
-            // Compress
-            setStatus(`Compressing ${imageFile.name}...`);
-            const compressedFile = await compressImage(imageFile);
-            
-            // Upload to Storage
-            setStatus(`Uploading ${imageFile.name}...`);
-            const storagePath = `products/${Date.now()}_${compressedFile.name}`;
-            const storageRef = ref(storage, storagePath);
-            const snapshot = await uploadBytes(storageRef, compressedFile);
-            imageUrl = await getDownloadURL(snapshot.ref);
+          if (imageUrls.length > 0) {
+            imageUrl = imageUrls[0];
           }
 
           // 2. Prepare Firestore Data
@@ -284,6 +301,7 @@ export default function BulkUploadPage() {
             type: "veg", // Default type for compatibility
             image: imageUrl,
             imageUrl: imageUrl, 
+            images: imageUrls, // Store all uploaded images
             variants: [
               { weight: "500g", price: Number(item.price), stock: Number(item.stock) || 0 }
             ],
@@ -326,7 +344,7 @@ export default function BulkUploadPage() {
         price: 250,
         category: "pickles",
         stock: 50,
-        imageName: "mango.jpg",
+        imageName: "mango1.jpg, mango2.jpg",
         isActive: "TRUE",
         startDate: "2024-01-01 00:00",
         endDate: "2025-12-31 23:59"
@@ -348,7 +366,7 @@ export default function BulkUploadPage() {
           <div>
             <h2 className="admin-card-title">Enhanced Bulk Product Upload</h2>
             <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>
-              Upload Excel + Images. Images will be auto-compressed and mapped.
+              Upload Excel + Images. Images will be auto-compressed and mapped. (Multiple images supported via comma-separated names)
             </p>
           </div>
           <button onClick={downloadSample} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
