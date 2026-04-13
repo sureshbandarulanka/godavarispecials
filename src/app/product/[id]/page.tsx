@@ -68,6 +68,12 @@ export default function ProductDetailPage() {
     return getBasePrice(selectedVariant);
   }, [product?.id, selectedVariant?.id, selectedVariant?.price, selectedVariant?.cost]);
 
+  const productImages = useMemo(() => {
+    if (product?.images && product.images.length > 0) return product.images;
+    if (product?.image) return [product.image];
+    return ['https://placehold.co/400x400?text=No+Image'];
+  }, [product]);
+
   useEffect(() => {
     setIsClient(true);
     window.scrollTo(0, 0);
@@ -142,12 +148,6 @@ export default function ProductDetailPage() {
     ? cartItems.find(item => item.product.id === product.id && item.weight === selectedVariant.weight)
     : null;
   const quantity = cartItem ? cartItem.quantity : 0;
-
-  const productImages = useMemo(() => {
-    if (product?.images && product.images.length > 0) return product.images;
-    if (product?.image) return [product.image];
-    return ['https://placehold.co/400x400?text=No+Image'];
-  }, [product]);
 
   const currentMrp = currentPrice ? Math.round(Number(selectedVariant?.mrp) || currentPrice * 1.2) : null;
   
