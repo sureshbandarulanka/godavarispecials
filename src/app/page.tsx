@@ -43,7 +43,7 @@ function HomeContent() {
   }, []);
 
   return (
-    <div className="pb-mobile-nav">
+    <div className="pb-mobile-nav home-page">
       <JsonLd data={getLocalBusinessSchema()} />
       <Header />
       <main className="main-content">

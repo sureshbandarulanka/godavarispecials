@@ -15,6 +15,11 @@
     padding-bottom: 160px !important;
   }
 
+  /* Fix: Home page lo gap lekunda padding-top reset chesthunam */
+  .home-page .main-content {
+    padding-top: 0 !important;
+  }
+
   /* Global bottom padding: all pages need clearance above the fixed bottom nav */
   .pb-mobile-nav {
     padding-bottom: 0; /* nav is fixed, page scroll handles it */
