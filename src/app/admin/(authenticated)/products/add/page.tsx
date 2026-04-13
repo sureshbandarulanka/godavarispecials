@@ -26,8 +26,8 @@ export default function AddProductPage() {
     type: 'veg' as 'veg' | 'non-veg' | 'sweet' | 'pindi-vantalu' | 'hot-snacks' | 'ghee' | 'oil',
   });
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const [variants, setVariants] = useState<Variant[]>([
     { weight: '250g', price: 0 }
@@ -40,23 +40,36 @@ export default function AddProductPage() {
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    // Validation
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      alert('Please select a valid image file (JPG, PNG, WebP)');
-      return;
-    }
+    const newFiles: File[] = [];
+    const newPreviews: string[] = [];
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert('File size must be less than 10MB');
-      return;
-    }
+    files.forEach(file => {
+      if (!validTypes.includes(file.type)) {
+        alert(`${file.name} is not a valid image (JPG, PNG, WebP)`);
+        return;
+      }
+      if (file.size > 2 * 1024 * 1024) {
+        alert(`${file.name} is too large (Max 2MB)`);
+        return;
+      }
+      newFiles.push(file);
+      newPreviews.push(URL.createObjectURL(file));
+    });
 
-    setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
+    setSelectedFiles(prev => [...prev, ...newFiles]);
+    setPreviewUrls(prev => [...prev, ...newPreviews]);
+  };
+
+  const removeFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   const handleVariantChange = (index: number, field: keyof Variant, value: string | number) => {
@@ -75,8 +88,8 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) {
-      alert('Please select a product image');
+    if (selectedFiles.length === 0) {
+      alert('Please select at least one product image');
       return;
     }
     setLoading(true);
@@ -90,25 +103,34 @@ export default function AddProductPage() {
         ...formData,
         categorySlug: selectedCat?.slug || '',
         variants,
-        image: '', // Placeholder
+        image: '', // Primary image (first one)
+        images: [], // All images
         createdAt: new Date().toISOString()
       };
 
       const productId = await addProduct(productData);
 
-      // 2. Upload image
+      // 2. Upload images
       setUploading(true);
-      const imageUrl = await uploadProductImage(productId, selectedFile);
+      const imageUrls = [];
+      for (const file of selectedFiles) {
+        const url = await uploadProductImage(productId, file);
+        imageUrls.push(url);
+      }
       setUploading(false);
 
-      // 3. Update product with real URL
-      await updateProduct(productId, { image: imageUrl });
+      // 3. Update product with real URLs
+      await updateProduct(productId, { 
+        image: imageUrls[0], 
+        images: imageUrls 
+      });
 
       setToast('Product added successfully!');
       setTimeout(() => {
         router.push('/admin/products');
       }, 2000);
     } catch (error) {
+      console.error('Upload Error:', error);
       alert('Failed to add product');
     } finally {
       setLoading(false);
@@ -175,26 +197,37 @@ export default function AddProductPage() {
                 </select>
               </div>
               <div className="form-group">
-                <label className="form-label">Product Image</label>
-                <div 
-                  className={`upload-field ${previewUrl ? 'has-file' : ''}`}
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  {previewUrl ? (
-                    <div className="upload-preview-container">
-                      <img src={previewUrl} alt="Preview" className="upload-preview" />
-                    </div>
-                  ) : (
-                    <div className="upload-placeholder">
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                      <span>Choose Product Image</span>
-                      <span className="upload-meta">JPG, PNG, WebP (Max 2MB)</span>
-                    </div>
-                  )}
+                <label className="form-label">Product Images (Multiple)</label>
+                <div className="multi-upload-container">
+                  <div 
+                    className="upload-trigger-box"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    <span>Click to Add Images</span>
+                    <span className="upload-meta">JPG, PNG, WebP (Max 2MB each)</span>
+                  </div>
+
+                  <div className="upload-previews-grid">
+                    {previewUrls.map((url, idx) => (
+                      <div key={idx} className="preview-item">
+                        <img src={url} alt={`Preview ${idx + 1}`} />
+                        <button 
+                          type="button" 
+                          className="remove-preview" 
+                          onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
+                        >
+                          ×
+                        </button>
+                        {idx === 0 && <span className="primary-badge">Main</span>}
+                      </div>
+                    ))}
+                  </div>
+
                   {uploading && (
                     <div className="upload-progress-overlay">
                       <div className="spinner"></div>
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#3b82f6' }}>Uploading...</span>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#3b82f6' }}>Uploading {selectedFiles.length} images...</span>
                     </div>
                   )}
                 </div>
@@ -203,6 +236,7 @@ export default function AddProductPage() {
                   ref={fileInputRef} 
                   style={{ display: 'none' }} 
                   accept="image/jpeg,image/png,image/webp"
+                  multiple
                   onChange={handleFileChange}
                 />
               </div>

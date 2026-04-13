@@ -18,6 +18,7 @@ export interface Product {
   description?: string;
   image?: string;
   imageUrl?: string;
+  images?: string[];
   variants: ProductVariant[];
   stock?: number;
   isActive?: boolean;

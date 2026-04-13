@@ -104,9 +104,9 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
-        {product.image ? (
+        {product.image || (product.images && product.images.length > 0) ? (
           <Image 
-            src={product.image} 
+            src={product.image || product.images![0]} 
             alt={product.name} 
             fill 
             sizes="(max-width: 768px) 50vw, 25vw"

@@ -143,11 +143,11 @@ export default function ProductDetailPage() {
     : null;
   const quantity = cartItem ? cartItem.quantity : 0;
 
-  const mockThumbnails = [
-    product.image || 'https://placehold.co/400x400?text=No+Image',
-    'https://placehold.co/400x400?text=View+2',
-    'https://placehold.co/400x400?text=View+3'
-  ];
+  const productImages = useMemo(() => {
+    if (product?.images && product.images.length > 0) return product.images;
+    if (product?.image) return [product.image];
+    return ['https://placehold.co/400x400?text=No+Image'];
+  }, [product]);
 
   const currentMrp = currentPrice ? Math.round(Number(selectedVariant?.mrp) || currentPrice * 1.2) : null;
   
@@ -194,7 +194,7 @@ export default function ProductDetailPage() {
               )}
             </div>
             <div className={styles.thumbnails}>
-              {mockThumbnails.map((img, idx) => (
+              {productImages.map((img, idx) => (
                 <div 
                   key={idx} 
                   className={`${styles.thumbnail} ${mainImage === img ? styles.thumbnailActive : ''}`}
