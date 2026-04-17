@@ -29,6 +29,7 @@ export default function Header() {
   const displayCity = (mounted && isHydrated) ? location.city : 'Hyderabad';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isPopping, setIsPopping] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   
@@ -109,6 +110,22 @@ export default function Header() {
     setSuggestions([]);
     setSearchQuery(query);
   };
+  
+  const totalQuantity = cartItems.reduce((acc, item) => acc + item.quantity, 0);
+  const prevCountRef = useRef(totalQuantity);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Trigger pop animation on item count increase, skipping initial load
+  useEffect(() => {
+    if (isMounted && totalQuantity > prevCountRef.current) {
+      setIsPopping(true);
+    }
+    prevCountRef.current = totalQuantity;
+  }, [totalQuantity, isMounted]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
@@ -255,7 +272,12 @@ export default function Header() {
             )}
 
             {pathname !== '/checkout' && (
-              <button id="cart-icon" className={styles.cartBtn} onClick={openCart}>
+              <button 
+                id="cart-icon" 
+                className={`${styles.cartBtn} ${isPopping ? styles.popUpdate : ''}`} 
+                onClick={openCart}
+                onAnimationEnd={() => setIsPopping(false)}
+              >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="9" cy="21" r="1"></circle>
                   <circle cx="20" cy="21" r="1"></circle>

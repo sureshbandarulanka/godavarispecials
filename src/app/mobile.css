@@ -9,28 +9,30 @@
 
   /* Fix: Policy/Info pages lo Header tarvata content header kindhaki vellipokunda 
      padding-top: 140px set chestunam (mobile header is sticky) */
-  .pb-mobile-nav .main-content {
-    padding-top: 140px !important;
-    /* Ensure content is not hidden behind fixed bottom nav bar (≈65px tall) */
-    padding-bottom: 160px !important;
+  /* MASTER SPACING RULE: 
+     Since header is fixed, we add top padding to the master wrapper once.
+     This ensures ALL pages start perfectly below the header. */
+  .app-shell {
+    padding-top: var(--header-height-mobile) !important;
   }
 
-  /* Fix: Home page lo gap lekunda padding-top reset chesthunam */
-  .home-page .main-content {
+  /* Fix: Account page doesn't use the standard header, so remove the global gap */
+  .app-shell:has(.mobile-profile-page) {
     padding-top: 0 !important;
+  }
+
+  /* Reset all individual page overrides since app-shell handles it now */
+  .pb-mobile-nav .main-content,
+  .home-page .main-content,
+  .categories-page .main-content,
+  .pb-mobile-nav .main-content[style] {
+    padding-top: 0 !important;
+    padding-bottom: 180px !important;
   }
 
   /* Global bottom padding: all pages need clearance above the fixed bottom nav */
   .pb-mobile-nav {
     padding-bottom: 0; /* nav is fixed, page scroll handles it */
-  }
-
-  /* Policy/info pages have inline style padding that overrides — reset to mobile values */
-  .pb-mobile-nav .main-content[style] {
-    padding-top: 140px !important;
-    padding-bottom: 160px !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
   }
 
   /* STEP 1: HIDE DESKTOP HEADER AND SECTIONS (MOBILE ONLY) */
@@ -59,9 +61,11 @@
     display: block !important;
     background: #fecc58;
     padding: 15px 16px 12px;
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 1000;
+    left: 0;
+    width: 100%;
+    z-index: 1100; /* Increased to stay above all content */
     border-bottom-left-radius: 20px;
     border-bottom-right-radius: 20px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
@@ -377,14 +381,14 @@
   /* Banners */
   .mobile-banners-section {
     background: #ffffff;
-    padding: 10px 16px 8px;
+    padding: 10px 0 8px;
   }
 
   .banner-scroll {
     display: flex;
     overflow-x: auto;
     gap: 12px;
-    padding: 0;
+    padding: 0 16px;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -395,25 +399,26 @@
   }
 
   .banner-card {
-    min-width: calc((100% - 12px));
-    /* One banner full width available after padding */
-    /* Wait, if I want 2 banners visible, I should use 100% as the scroll unit but make cards smaller? */
-    /* No, the user wants 2 banners side by side. */
-    min-width: calc((100% - 12px) / 2);
+    min-width: calc(100% - 40px);
     border-radius: 12px;
     overflow: hidden;
-    scroll-snap-align: start;
+    scroll-snap-align: center;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     flex-shrink: 0;
     position: relative;
   }
 
-  .banner-card img {
+  .banner-image-wrapper {
+    position: relative;
     width: 100%;
-    height: 140px;
-    /* Reduced from 160px as requested */
+    height: 170px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .banner-card img {
+    /* No longer needed as Image component handles it, but kept for fallback or specific cases */
     object-fit: cover;
-    display: block;
   }
 
   .banner-overlay {
@@ -479,8 +484,8 @@
     display: flex;
     overflow-x: auto;
     overflow-y: visible;
-    /* gap tightened so the next category is slightly visible (peek effect) */
-    gap: 10px;
+    /* gap tightened so the 6th category is partially visible (peek effect) */
+    gap: 7px;
     /* right padding intentionally short so user can see next item peeks */
     padding: 6px 14px 8px;
     scrollbar-width: none;
@@ -517,6 +522,7 @@
     padding: 6px;
     margin-bottom: 2px;
     position: relative;
+    overflow: hidden; /* Added for Image fill */
   }
 
   .category-icon-wrapper img {
@@ -579,63 +585,75 @@
     left: 0 !important;
     right: 0 !important;
     width: 100% !important;
-    /* Lift above web browser chrome on iOS/Android */
-    padding-bottom: env(safe-area-inset-bottom, 8px);
-    padding-top: 8px;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    /* Proper safe area handling */
+    padding-bottom: env(safe-area-inset-bottom, 12px);
+    padding-top: 10px;
+    background: #ffffff;
     display: flex !important;
     justify-content: space-around;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.07);
-    z-index: 999 !important;
+    align-items: center;
+    border-top: 1px solid #f1f5f9;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    z-index: 2000 !important;
     border-radius: 20px 20px 0 0;
-    /* Ensure it is never displaced by transforms */
     transform: none !important;
-    will-change: auto !important;
   }
 
   .nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
-    color: #8a8a8a;
+    justify-content: center;
+    gap: 2px;
+    color: #94a3b8;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: all 0.2s ease;
     flex: 1;
-    padding: 2px 0;
+    height: 48px;
+    max-width: 72px;
+    margin: 0 4px;
     cursor: pointer;
+    position: relative;
+    border-radius: 12px; /* For the active pill background */
   }
 
   .nav-item.active {
-    color: #fecc58;
+    background: rgba(254, 204, 88, 0.15); /* Soft Amber/Gold Pill */
+    color: #f59e0b;
+  }
+
+  /* Clear any previous indicators */
+  .nav-item.active::before {
+    display: none;
   }
 
   .nav-label {
-    font-size: 9.5px;
+    font-size: 10px;
     font-weight: 700;
-    letter-spacing: -0.2px;
+    letter-spacing: -0.1px;
+    margin-top: 2px;
+  }
+
+  .nav-item.active .nav-label {
+    font-weight: 800;
   }
 
   .nav-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 22px;
+    height: 24px;
     transition: transform 0.15s ease;
   }
 
   .nav-item:active .nav-icon {
     transform: scale(0.9);
   }
-
   /* Categories Grid Page */
   .categories-page {
     background: #fff;
     min-height: 100vh;
-    padding: 10px 16px 120px !important;
+    padding: 0 16px 180px !important; /* Reset top, maintain bottom clearance */
   }
 
   .categories-header-title {

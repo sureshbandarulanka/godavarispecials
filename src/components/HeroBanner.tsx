@@ -35,10 +35,10 @@ const FALLBACK_BANNERS: any[] = [
   }
 ];
 
-export default function HeroBanner() {
-  const [activeBanners, setActiveBanners] = useState<any[]>([]);
+export default function HeroBanner({ initialBanners = [] }: { initialBanners?: any[] }) {
+  const [activeBanners, setActiveBanners] = useState<any[]>(initialBanners);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialBanners.length === 0);
   const router = useRouter();
 
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function HeroBanner() {
           >
             <Image
               src={banner.imageUrl}
-              alt={banner.title || 'Banner'}
+              alt={banner.title || 'Godavari Specials Banner'}
               fill
               priority={slotIdx === 0}
               className={styles.bannerImage}

@@ -9,9 +9,9 @@ export async function POST(request: Request) {
     const key_secret = process.env.RAZORPAY_KEY_SECRET;
 
     if (!key_id || !key_secret || key_id === 'your_live_key_id') {
-      console.error("❌ Razorpay keys are missing or still using placeholders in .env.local");
+      console.error("❌ Razorpay keys are missing or still using placeholders in .env");
       return NextResponse.json(
-        { error: "Payment gateway is not configured. Please add valid Razorpay keys to .env.local." },
+        { error: "Payment gateway is not configured. Please add valid Razorpay keys to .env." },
         { status: 500 }
       );
     }

@@ -1,79 +1,41 @@
-"use client";
-import React, { useEffect } from 'react';
-import Header from "@/components/Header";
-import HeroBanner from "@/components/HeroBanner";
-import CategoriesRow from "@/components/CategoriesRow";
-import BestOffers from "@/components/BestOffers";
-import HomeGiftPromo from "@/components/HomeGiftPromo";
-import CategorySection from "@/components/CategorySection";
-import Footer from "@/components/Footer";
-import FloatingNav from "@/components/FloatingNav";
-import { subscribeToProducts } from "@/services/productService";
-import { products as localProducts } from "@/data/products";
-import { useSearchParams } from 'next/navigation';
-import { useState } from 'react';
-import { useCategories } from '@/context/CategoryContext';
-import { Suspense } from 'react';
-import PageSkeleton from "@/components/PageSkeleton";
+import React from 'react';
+import HomeContent from "@/components/HomeContent";
+import { getProductsAsync, getCategoriesAsync } from "@/services/productService";
+import { getActiveBanners } from "@/services/bannerService";
+import { getActiveOffers } from "@/services/offerService";
 import JsonLd, { getLocalBusinessSchema } from "@/components/JsonLd";
+import { Metadata } from 'next';
 
-function HomeContent() {
-  const searchParams = useSearchParams();
-  const { categories, loading: categoriesLoading } = useCategories();
-  const [allProducts, setAllProducts] = useState<any[]>([]);
+export const metadata: Metadata = {
+  title: "Godavari Specials | Home of Authentic Telugu Ruchulu & Pindi Vantalu",
+  description: "Experience the real Godavari Ruchulu. Shop for 100% natural, healthy organic pickles, traditional sweets, and pure oils. Authentic Telugu foods delivered fresh.",
+};
 
-  useEffect(() => {
-    if (searchParams.get('scrollToTop') === 'true') {
-      const banner = document.getElementById('home-banner');
-      if (banner) {
-        banner.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
-    }
-  }, [searchParams]);
+// This is a Server Component by default in Next.js 16/15
+export default async function Home() {
+  // Fetch data in parallel on the server
+  const [products, categories, banners, offers] = await Promise.all([
+    getProductsAsync(),
+    getCategoriesAsync(),
+    getActiveBanners(),
+    getActiveOffers()
+  ]);
 
-  // 🔥 Real-time product subscription — auto-updates when admin adds/edits
-  useEffect(() => {
-    const unsubscribe = subscribeToProducts(
-      (products) => setAllProducts(products),
-      () => setAllProducts(localProducts) // fallback on error
-    );
-    return () => unsubscribe();
-  }, []);
+  // Convert Firebase timestamps to strings/numbers for serialization if necessary
+  const serializedProducts = JSON.parse(JSON.stringify(products));
+  const serializedCategories = JSON.parse(JSON.stringify(categories));
+  const serializedBanners = JSON.parse(JSON.stringify(banners));
+  const serializedOffers = JSON.parse(JSON.stringify(offers));
 
   return (
-    <div className="pb-mobile-nav home-page">
+    <>
       <JsonLd data={getLocalBusinessSchema()} />
-      <Header />
-      <main className="main-content">
-        <HeroBanner />
-        <HomeGiftPromo />
-        <CategoriesRow />
-        <BestOffers />
-        {categories.map((category, index) => {
-          const catProducts = allProducts.filter((p: any) => p.categorySlug === category.slug);
-          return (
-            <CategorySection 
-              key={category.id || category.slug} 
-              title={category.name} 
-              slug={category.slug}
-              products={catProducts} 
-              isAlternate={index % 2 !== 0} 
-            />
-          );
-        })}
-      </main>
-      <Footer />
-      <FloatingNav />
-    </div>
-  );
-}
-
-export default function Home() {
-  return (
-    <Suspense fallback={<PageSkeleton />}>
-      <HomeContent />
-    </Suspense>
+      <HomeContent 
+        initialProducts={serializedProducts} 
+        initialCategories={serializedCategories}
+        initialBanners={serializedBanners}
+        initialOffers={serializedOffers}
+      />
+    </>
   );
 }

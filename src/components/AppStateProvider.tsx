@@ -6,9 +6,8 @@ import PageSkeleton from './PageSkeleton';
 export default function AppStateProvider({ children }: { children: React.ReactNode }) {
   const mounted = useClientMount();
 
-  if (!mounted) {
-    return <PageSkeleton />;
-  }
+  // We no longer block the entire app with a skeleton.
+  // Content is now SSR-ready for better performance.
 
   return (
     <div className="app-ready">

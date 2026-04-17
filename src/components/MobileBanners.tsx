@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { subscribeToActiveBanners, Banner } from '@/services/bannerService';
 
 const FALLBACK_MOBILE_BANNERS = [
@@ -10,10 +11,10 @@ const FALLBACK_MOBILE_BANNERS = [
   { id: 'm-fb-4', imageUrl: '/assets/banners/banner02-slide02.png', title: 'Traditional Podis', redirectUrl: '/category/Authentic%20Podis' },
 ];
 
-export default function MobileBanners() {
-  const [banners, setBanners] = useState<(Banner | any)[]>([]);
+export default function MobileBanners({ initialBanners = [] }: { initialBanners?: any[] }) {
+  const [banners, setBanners] = useState<(Banner | any)[]>(initialBanners);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(initialBanners.length === 0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -99,7 +100,16 @@ export default function MobileBanners() {
             onClick={() => handleBannerClick(banner)}
             style={{ cursor: 'pointer' }}
           >
-            <img src={banner.imageUrl} alt={banner.title} loading="lazy" />
+            <div className="banner-image-wrapper">
+                <Image 
+                  src={banner.imageUrl} 
+                  alt={banner.title || 'Special Offer Banner'} 
+                  fill 
+                  priority={banners.indexOf(banner) === 0}
+                  style={{ objectFit: 'cover' }}
+                  sizes="100vw"
+                />
+            </div>
             <div className="banner-overlay">
               <button 
                 className="banner-order-btn"

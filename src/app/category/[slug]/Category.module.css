@@ -1,7 +1,7 @@
 .container {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 24px 16px 16px; 
+  padding: 8px 16px 16px; 
   display: flex;
   gap: 24px;
   min-height: calc(100vh - 200px);
@@ -242,8 +242,8 @@
   .container {
     display: flex;
     flex-direction: column;
-    padding: 12px 8px; /* Increased top padding from 0 to 12px */
-    gap: 8px;
+    padding: 12px 0px; 
+    gap: 0;
   }
   
   .sidebar {
@@ -257,10 +257,13 @@
   }
   
   .grid {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    justify-items: center;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr; /* Ensures cards in the same row have identical height */
+    gap: 12px;
     width: 100%;
+    padding: 0 10px;
+    justify-content: center;
   }
 }
 
@@ -313,16 +316,26 @@
 
 @media (max-width: 767px) {
   .subCategoryContainer {
-    gap: 8px;
-    margin-bottom: 16px;
-    padding: 4px 0 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 4px 8px 8px;
   }
   
   .subCategoryBtn {
-    padding: 6px 14px;
-    font-size: 12px;
-    gap: 6px;
+    padding: 6px 10px;
+    font-size: clamp(9px, 2.8vw, 11px);
+    flex: 0 1 auto;
+    width: auto;
+    gap: 4px;
     border-width: 1px;
+    border-radius: 8px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
   }
   

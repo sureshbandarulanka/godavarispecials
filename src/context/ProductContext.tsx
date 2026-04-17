@@ -12,19 +12,31 @@ interface ProductContextType {
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
-export const ProductProvider = ({ children }: { children: React.ReactNode }) => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+export const ProductProvider = ({ 
+  children, 
+  initialProducts = [] 
+}: { 
+  children: React.ReactNode, 
+  initialProducts?: Product[] 
+}) => {
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [loading, setLoading] = useState(initialProducts.length === 0);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToProducts(
       (items) => {
-        setProducts(items);
+        // Only update if we have items to prevent flash
+        if (items && items.length > 0) {
+          setProducts(items);
+        }
         setLoading(false);
       },
       () => {
-        setError(true);
+        // Fallback to initial products if error occurs after mount
+        if (products.length === 0) {
+          setError(true);
+        }
         setLoading(false);
       }
     );

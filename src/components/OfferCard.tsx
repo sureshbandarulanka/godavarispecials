@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import styles from './OfferCard.module.css';
 import { Offer } from '@/services/offerService';
 import { useCountdown } from '@/hooks/useCountdown';
+import Image from 'next/image';
 
 export default function OfferCard({ offer }: { offer: Offer }) {
   const router = useRouter();
@@ -43,9 +44,23 @@ export default function OfferCard({ offer }: { offer: Offer }) {
       
       <div className={styles.imageContainer}>
         {offer.imageUrl ? (
-          <img src={offer.imageUrl} alt={offer.title} className={styles.offerImage} loading="lazy" />
+          <Image 
+            src={offer.imageUrl} 
+            alt={offer.title || 'Special Offer'} 
+            fill 
+            sizes="(max-width: 768px) 100vw, 30vw"
+            className={styles.offerImage} 
+            style={{ objectFit: 'cover' }}
+          />
         ) : offer.productImage ? (
-          <img src={offer.productImage} alt={offer.title} className={styles.offerImage} loading="lazy" />
+          <Image 
+            src={offer.productImage} 
+            alt={offer.title || 'Product Offer'} 
+            fill 
+            sizes="(max-width: 768px) 100vw, 30vw"
+            className={styles.offerImage} 
+            style={{ objectFit: 'cover' }}
+          />
         ) : (
           <div className={styles.placeholder}>
             No Banner Uploaded

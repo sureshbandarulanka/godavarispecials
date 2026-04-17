@@ -11,24 +11,31 @@ export default function StickyCartBar() {
   
   const itemCount = cartItems.reduce((acc, item) => acc + item.quantity, 0);
 
-  // Trigger pop animation on item count change
+  const prevCountRef = React.useRef(itemCount);
+  const [isMounted, setIsMounted] = useState(false);
+
   useEffect(() => {
-    if (itemCount > 0) {
+    setIsMounted(true);
+  }, []);
+
+  // Trigger pop animation on item count increase, but skip initial load
+  useEffect(() => {
+    if (isMounted && itemCount > prevCountRef.current) {
       setIsPopping(true);
-      const timer = setTimeout(() => setIsPopping(false), 400);
-      return () => clearTimeout(timer);
+      // isPopping will be reset by onAnimationEnd
     }
-  }, [itemCount]);
+    prevCountRef.current = itemCount;
+  }, [itemCount, isMounted]);
 
   if (cartItems.length === 0 || isCartOpen || pathname === '/checkout') return null;
 
   return (
     <div 
-      className={`${styles.stickyBar} ${isPopping ? styles.popUpdate : ''}`}
+      className={styles.stickyBar}
       onClick={openCart}
       role="button"
     >
-      <div className={styles.container}>
+      <div className={`${styles.container} ${isPopping ? styles.popUpdate : ''}`} onAnimationEnd={() => setIsPopping(false)}>
         <div className={styles.cartInfo}>
           <div className={styles.price}>₹{cartTotal.toFixed(2)}</div>
           <div className={styles.divider}></div>

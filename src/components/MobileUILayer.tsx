@@ -15,7 +15,13 @@ import MobileCategories from "./MobileCategories";
  * never render on the server. During the brief pre-hydration window
  * a pixel-perfect shimmer skeleton is shown instead, eliminating CLS.
  */
-export default function MobileUILayer() {
+export default function MobileUILayer({ 
+  initialCategories = [], 
+  initialBanners = [] 
+}: { 
+  initialCategories?: any[], 
+  initialBanners?: any[] 
+}) {
   const pathname = usePathname();
 
   const isHomePage = pathname === "/";
@@ -26,8 +32,8 @@ export default function MobileUILayer() {
   return (
     <>
       <MobileHeader />
-      {showMobileCategories && <MobileCategories />}
-      {showMobileBanners && <MobileBanners />}
+      {showMobileCategories && <MobileCategories initialCategories={initialCategories} />}
+      {showMobileBanners && <MobileBanners initialBanners={initialBanners} />}
     </>
   );
 }

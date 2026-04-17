@@ -6,7 +6,7 @@
 .container {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 40px 16px 160px; /* Increased bottom padding for sticky bar */
+  padding: 16px 16px 160px; /* Reduced top padding, kept bottom padding for sticky bar */
 }
 
 .headerRow {

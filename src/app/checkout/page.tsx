@@ -10,7 +10,7 @@ import { placeOrderAsync, logFailedPayment, getStoreSettings } from '@/services/
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { useLocation } from '@/context/LocationContext';
 import { parseWeight } from '@/utils/parseWeight';
-import { Gift, ChevronRight } from 'lucide-react';
+import { Gift, ChevronRight, Banknote, CreditCard, ShieldCheck } from 'lucide-react';
 
 
 interface Address {
@@ -24,10 +24,7 @@ interface Address {
   pincode: string;
 }
 
-const PAYMENT_ICONS = {
-  COD: '/assets/Payments/cod.png',
-  ONLINE: '/assets/Payments/online.png'
-};
+// Removed static image icons to use Lucide icons for better performance and consistency
 
 export default function CheckoutPage() {
   const { user } = useAuth();
@@ -575,7 +572,7 @@ export default function CheckoutPage() {
                 <span className={styles.sectionIcon}>💳</span>
                 <h3>Payment Method</h3>
                 <div className={styles.secureBadge}>
-                  <span className={styles.shieldIcon}>🛡️</span>
+                  <ShieldCheck size={16} className={styles.shieldIcon} />
                   100% Secure
                 </div>
               </div>
@@ -585,7 +582,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('COD')}
                 >
                   <div className={styles.paymentCardIcon}>
-                    <img src={PAYMENT_ICONS.COD} alt="COD" />
+                    <Banknote size={24} color="#15803d" />
                   </div>
                   <div className={styles.paymentCardContent}>
                     <span className={styles.paymentCardTitle}>Cash on Delivery</span>
@@ -599,7 +596,7 @@ export default function CheckoutPage() {
                   onClick={() => setPaymentMethod('ONLINE')}
                 >
                   <div className={styles.paymentCardIcon}>
-                    <img src={PAYMENT_ICONS.ONLINE} alt="Online" />
+                    <CreditCard size={24} color="#2563eb" />
                   </div>
                   <div className={styles.paymentCardContent}>
                     <span className={styles.paymentCardTitle}>Pay Online</span>

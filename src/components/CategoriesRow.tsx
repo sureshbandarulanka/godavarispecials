@@ -4,11 +4,15 @@ import { useParams, usePathname, useRouter } from 'next/navigation';
 import styles from './CategoriesRow.module.css';
 import { useCategories } from '@/context/CategoryContext';
 
-export default function CategoriesRow() {
+import Image from 'next/image';
+
+export default function CategoriesRow({ initialCategories = [] }: { initialCategories?: any[] }) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useParams();
-  const { categories, loading } = useCategories();
+  const { categories, loading: contextLoading } = useCategories();
+
+  const loading = contextLoading && categories.length === 0 && initialCategories.length === 0;
 
   const currentSlug = typeof params?.slug === 'string' ? params.slug : '';
 
@@ -26,7 +30,7 @@ export default function CategoriesRow() {
 
   const displayCategories = [
     { id: 'foryou', name: 'FOR YOU', slug: '/', imageUrl: '/assets/categories/foryou.png' },
-    ...categories
+    ...(categories.length > 0 ? categories : initialCategories)
   ];
 
   return (
@@ -61,17 +65,13 @@ export default function CategoriesRow() {
               )}
               <div className={styles.imageRelative}>
                 <div className={styles.imageWrapper}>
-                  <img 
-                    src={cat.imageUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="%23cccccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>'} 
-                    alt={cat.name} 
+                  <Image 
+                    src={cat.imageUrl || '/assets/categories/foryou.png'} 
+                    alt={cat.name || 'Category'} 
                     className={styles.categoryImage} 
-                    loading="lazy"
                     width={68}
                     height={68}
-                    onError={(e) => {
-                      e.currentTarget.onerror = null;
-                      e.currentTarget.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="68" height="68" viewBox="0 0 24 24" fill="none" stroke="%23cccccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-                    }}
+                    priority={cat.slug === '/'}
                   />
                 </div>
               </div>

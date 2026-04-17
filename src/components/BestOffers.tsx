@@ -5,9 +5,9 @@ import { subscribeToActiveOffers, Offer } from '@/services/offerService';
 import Skeleton from './Skeleton';
 import styles from './CategorySection.module.css';
 
-export default function BestOffers() {
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function BestOffers({ initialOffers = [] }: { initialOffers?: Offer[] }) {
+  const [offers, setOffers] = useState<Offer[]>(initialOffers);
+  const [loading, setLoading] = useState(initialOffers.length === 0);
   const carouselRef = useRef<HTMLDivElement>(null);
   
   const scroll = (direction: 'left' | 'right') => {

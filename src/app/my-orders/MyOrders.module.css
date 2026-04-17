@@ -1,14 +1,15 @@
 .page {
-  padding-top: 86px;
+  padding-top: 0;
   padding-bottom: 60px;
-  max-width: 800px;
+  max-width: 900px;
 }
 
 .pageTitle {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: 24px;
+  margin-bottom: 32px;
+  letter-spacing: -0.02em;
 }
 
 .emptyState {
@@ -16,55 +17,62 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 80px 20px;
+  padding: 100px 20px;
   text-align: center;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--border-color);
 }
 
 .emptyIcon {
-  font-size: 64px;
-  margin-bottom: 16px;
+  font-size: 80px;
+  margin-bottom: 24px;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
 }
 
 .emptyTitle {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   color: var(--text-primary);
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .emptySubtitle {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--text-secondary);
   margin-bottom: 32px;
-  max-width: 300px;
+  max-width: 320px;
+  line-height: 1.5;
 }
 
 .ordersList {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .orderCard {
   background: white;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 1px solid var(--border-color);
   overflow: hidden;
-  transition: box-shadow 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 }
 
 .orderCard:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
 
 .cardHeader {
-  padding: 16px 20px;
+  padding: 20px 24px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  background: linear-gradient(to right, #ffffff, #fcfcfc);
+  border-bottom: 1px solid #f8fafc;
 }
 
 .headerMain {
@@ -75,202 +83,254 @@
 
 .orderId {
   font-weight: 800;
-  font-size: 1rem;
-  color: var(--text-primary);
+  font-size: 1.1rem;
+  color: var(--brand-blue);
 }
 
 .orderDate {
   font-size: 0.85rem;
   color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .statusBadge {
-  padding: 6px 12px;
-  border-radius: 20px;
+  padding: 8px 16px;
+  border-radius: 99px;
   font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .cardBody {
-  padding: 0 20px 16px;
+  padding: 24px;
   display: flex;
-  gap: 32px;
+  gap: 48px;
+  background: white;
 }
 
 .summaryItem {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-secondary);
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .value {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.1rem;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
 .cardActions {
-  padding: 16px 20px;
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
-  border-top: 1px dashed var(--border-color);
+  align-items: center;
+  background: #fbfbfb;
+  border-top: 1px solid #f1f5f9;
 }
 
 .btnDetails {
-  background: none;
-  border: none;
-  color: var(--brand-blue);
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 0;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.btnDetails:hover {
+  background: #f8fafc;
+  border-color: var(--brand-blue);
+  color: var(--brand-blue);
 }
 
 .btnTrack {
   background: var(--brand-blue);
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-weight: 700;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-weight: 800;
   font-size: 0.85rem;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(52, 114, 186, 0.2);
 }
 
 .btnTrack:hover {
-  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(52, 114, 186, 0.3);
 }
 
 .detailsSection {
-  padding: 16px 20px;
-  background: #fcfcfc;
-}
-
-.divider {
-  height: 1px;
-  background: var(--border-color);
-  margin-bottom: 16px;
+  padding: 24px;
+  background: #ffffff;
+  border-top: 1px dashed var(--border-color);
 }
 
 .itemsList {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 14px;
+  margin-bottom: 24px;
 }
 
 .itemRow {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
 }
 
 .itemQty {
-  color: var(--text-secondary);
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 24px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--brand-blue);
+  font-weight: 800;
   margin-right: 12px;
 }
 
 .itemName {
   flex: 1;
   color: var(--text-primary);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .itemPrice {
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
 .deliveryInfo {
-  background: white;
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #eef2f6;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .infoRow {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   font-size: 0.85rem;
 }
 
 .infoLabel {
   color: var(--text-secondary);
-  font-weight: 600;
-  white-space: nowrap;
+  font-weight: 700;
+  min-width: 120px;
+  text-transform: uppercase;
+  font-size: 0.7rem;
 }
 
 .infoValue {
   color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 @media (max-width: 767px) {
   .page {
-    padding-top: 24px;
-    padding-bottom: 160px;
-    padding-left: 16px;
-    padding-right: 16px;
+    padding-top: 0; /* REMOVED TOP SPACE - using global main-content header padding */
+    padding-bottom: 120px;
+    padding-left: 12px;
+    padding-right: 12px;
   }
 
   .pageTitle {
-    font-size: 22px;
+    font-size: 26px;
     font-weight: 800;
-    margin-bottom: 16px;
-    color: var(--text-primary);
+    margin-bottom: 20px;
   }
 
-  .emptyState {
-    padding: 60px 16px;
-    border-radius: 12px;
-  }
-
-  .emptyIcon {
-    font-size: 48px;
-  }
-
-  .emptyTitle {
-    font-size: 18px;
+  .orderCard {
+    border-radius: 14px;
   }
 
   .cardHeader {
-    padding: 12px 16px;
+    padding: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .statusBadge {
+    width: fit-content;
+    padding: 6px 12px;
   }
 
   .cardBody {
-    padding: 0 16px 12px;
+    padding: 16px;
     gap: 16px;
+    justify-content: space-between;
+  }
+
+  .summaryItem {
+    gap: 2px;
+  }
+
+  .value {
+    font-size: 1rem;
   }
 
   .cardActions {
     padding: 12px 16px;
-    flex-direction: column;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actionGroup {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+    margin-top: 4px;
   }
 
   .btnTrack {
     width: 100%;
     text-align: center;
+    order: -1; /* Track button on top for mobile prominence */
+  }
+
+  .btnDetails {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .downloadBtn {
+    flex: 1;
+    justify-content: center;
   }
 
   .detailsSection {
-    padding: 12px 16px;
+    padding: 16px;
+  }
+
+  .infoLabel {
+    min-width: 90px;
   }
 }

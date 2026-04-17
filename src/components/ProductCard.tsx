@@ -52,34 +52,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
     addToCart(product, selectedVariant.weight, baseSellingPrice);
 
-    const button = e.currentTarget;
-    const card = button.closest(`.${styles.productCard}`) as HTMLElement;
-    const cartIcon = document.getElementById('cart-icon');
-
-    if (card && cartIcon) {
-      const cardRect = card.getBoundingClientRect();
-      const cartRect = cartIcon.getBoundingClientRect();
-
-      const clone = card.cloneNode(true) as HTMLElement;
-      clone.classList.add('fly-image');
-      clone.style.width = `${cardRect.width}px`;
-      clone.style.height = `${cardRect.height}px`;
-      clone.style.left = `${cardRect.left}px`;
-      clone.style.top = `${cardRect.top}px`;
-      clone.style.margin = '0';
-      document.body.appendChild(clone);
-
-      requestAnimationFrame(() => {
-        clone.style.transform = `translate(${cartRect.left - cardRect.left}px, ${cartRect.top - cardRect.top}px) scale(0.2)`;
-        clone.style.opacity = '0.5';
-      });
-
-      setTimeout(() => {
-        clone.remove();
-        cartIcon.classList.add('cart-bounce');
-        setTimeout(() => cartIcon.classList.remove('cart-bounce'), 400);
-      }, 600);
-    }
+    // Animation handled by components listening to cart state
   };
 
   const handleIncrease = (e: React.MouseEvent) => {
@@ -94,7 +67,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
   return (
     <div 
-      className={`${styles.productCard} ${quantity > 0 ? 'added-to-cart' : ''} animate-slide-up hover-lift`}
+      className={`${styles.productCard} ${quantity > 0 ? styles.addedItem : ''} animate-slide-up`}
       onClick={handleNav}
     >
       <div className={styles.imageContainer}>
@@ -107,7 +80,7 @@ export default function ProductCard({ product }: { product: Product }) {
         {product.image || (product.images && product.images.length > 0) ? (
           <Image 
             src={product.image || product.images![0]} 
-            alt={product.name} 
+            alt={product.name || 'Product Image'} 
             fill 
             sizes="(max-width: 768px) 50vw, 25vw"
             className={`${styles.productImage} transition-all`} 

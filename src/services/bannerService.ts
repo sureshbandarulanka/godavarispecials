@@ -12,7 +12,8 @@ import {
   orderBy, 
   where, 
   limit,
-  onSnapshot
+  onSnapshot,
+  writeBatch
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { compressImage } from "@/utils/compressImage";
@@ -46,7 +47,7 @@ export const getStoragePathFromUrl = (url: string) => {
 // ✅ Get All Banners (for Admin)
 export const getAdminBanners = async (): Promise<Banner[]> => {
   try {
-    const bannersQuery = query(collection(db, "banners"), orderBy("createdAt", "desc"));
+    const bannersQuery = query(collection(db, "banners"), orderBy("priority", "asc"));
     const querySnapshot = await getDocs(bannersQuery);
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
@@ -228,6 +229,21 @@ export const uploadBannerImage = async (file: File): Promise<string> => {
     return downloadURL;
   } catch (error) {
     console.error("Banner image upload error:", error);
+    throw error;
+  }
+};
+
+// ✅ Update Banners Order (Batch Update)
+export const updateBannersOrder = async (reorderedBanners: Banner[]) => {
+  try {
+    const batch = writeBatch(db);
+    reorderedBanners.forEach((banner, index) => {
+      const docRef = doc(db, "banners", banner.id);
+      batch.update(docRef, { priority: index, updatedAt: serverTimestamp() });
+    });
+    await batch.commit();
+  } catch (error) {
+    console.error("Error updating banner order:", error);
     throw error;
   }
 };

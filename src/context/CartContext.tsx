@@ -127,29 +127,44 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     }, 1500);
   };
 
+  // Memoize the context value to prevent double renders in consumers like StickyCartBar
+  const contextValue = React.useMemo(() => ({
+    cartItems: processedCartItems, 
+    addToCart, 
+    removeFromCart, 
+    updateQuantity, 
+    clearCart, 
+    itemsTotal,
+    comboDiscount,
+    cartTotal, 
+    totalQuantity,
+    isMinimumOrderMet,
+    isTargetMet,
+    isCartOpen, 
+    openCart, 
+    closeCart, 
+    toastMessage, 
+    showToast,
+    shippingCharge: finalShippingCharge,
+    minOrderValue: currentRule.minOrder,
+    freeDeliveryThreshold: currentRule.freeDelivery,
+    deliveryEta: currentRule.eta
+  }), [
+    processedCartItems,
+    itemsTotal,
+    comboDiscount,
+    cartTotal,
+    totalQuantity,
+    isMinimumOrderMet,
+    isTargetMet,
+    isCartOpen,
+    toastMessage,
+    finalShippingCharge,
+    currentRule
+  ]);
+
   return (
-    <CartContext.Provider value={{ 
-      cartItems: processedCartItems, 
-      addToCart, 
-      removeFromCart, 
-      updateQuantity, 
-      clearCart, 
-      itemsTotal,
-      comboDiscount,
-      cartTotal, 
-      totalQuantity,
-      isMinimumOrderMet,
-      isTargetMet,
-      isCartOpen, 
-      openCart, 
-      closeCart, 
-      toastMessage, 
-      showToast,
-      shippingCharge: finalShippingCharge,
-      minOrderValue: currentRule.minOrder,
-      freeDeliveryThreshold: currentRule.freeDelivery,
-      deliveryEta: currentRule.eta
-    }}>
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );

@@ -159,16 +159,6 @@ export default function MyProfilePage() {
                       className={styles.input}
                     />
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>Date of Birth</label>
-                    <input 
-                      type="date" 
-                      name="dob" 
-                      value={formData.dob} 
-                      onChange={handleChange} 
-                      className={styles.input}
-                    />
-                  </div>
                 </div>
 
                 <div className={styles.sectionTitle}>Delivery Address</div>
@@ -223,11 +213,6 @@ export default function MyProfilePage() {
             <h2 className="profile-name-large">{formData.name || 'Set your name'}</h2>
             <div className="profile-meta-row">
               {formData.phone && <span className="profile-meta-item">📞 {formData.phone}</span>}
-              {formData.dob && (
-                <span className="profile-meta-item">
-                  🎂 {new Date(formData.dob).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                </span>
-              )}
             </div>
             
             <button className="update-profile-btn" onClick={(e) => { e.stopPropagation(); setIsEditModalOpen(true); }}>

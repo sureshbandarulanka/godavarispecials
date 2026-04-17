@@ -28,11 +28,11 @@ export default function Footer() {
         {/* Column 1: Brand + Trust */}
         <div className={styles.column}>
           <a href="/" onClick={handleLogoClick}>
-            <img src="/assets/logo.png" alt="Godavari Specials" className={styles.footerLogo} />
+            <img src="/assets/logo.png" alt="GS - Godavari Specials" className={styles.footerLogo} />
           </a>
-          <p className={styles.tagline}>Authentic Godavari Foods, Delivered Fresh.</p>
+          <p className={styles.tagline}>Authentic Telugu Ruchulu & Pindi Vantalu, Delivered Fresh.</p>
           <p className={styles.description}>
-            Traditional homemade pickles, sweets & dry fish directly from Godavari region.
+            Traditional homemade pickles, sweets & dry fish directly from Godavari region by GS.
           </p>
           <div className={styles.trustBadges}>
             <div className={styles.trustBadge}>
@@ -117,7 +117,7 @@ export default function Footer() {
 
         {/* Copyright Bar */}
         <div className={styles.copyrightBar}>
-          © {new Date().getFullYear()} Godavari Specials. All rights reserved.
+          © {new Date().getFullYear()} GS | Godavari Specials. All rights reserved.
         </div>
       </div>
     </footer>

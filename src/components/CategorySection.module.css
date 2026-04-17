@@ -1,6 +1,6 @@
 .section {
-  padding: 8px 0;
-  margin-bottom: 8px; 
+  padding: 16px 0;
+  margin-bottom: 40px; 
 }
 
 .alternateBg {
@@ -93,8 +93,7 @@
 }
 
 .carouselItem {
-  flex: 0 0 calc(50% - 12px); /* 2 cards per row on mobile basically */
-  min-width: 180px;
+  flex: 0 0 calc(50% - 12px); /* Default for desktop/tablet if not overridden */
 }
 
 @media (max-width: 768px) {
@@ -113,15 +112,19 @@
     padding-bottom: 8px;
     padding-left: 16px;
     padding-right: 16px;
-    align-items: stretch; /* Force all cards to same height */
+    align-items: stretch;
   }
 
   .carouselItem {
-    flex: 0 0 calc((100% - 16px) / 3);
-    min-width: 100px;
+    flex: 0 0 calc(50% - 4px); /* Show exactly 2 cards with minimal peek */
     display: flex;
     flex-direction: column;
-    height: 240px; /* Match card fixed height */
+    height: auto;
+  }
+
+  .section {
+    padding: 8px 0;
+    margin-bottom: 12px;
   }
 
   .title {

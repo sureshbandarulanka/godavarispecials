@@ -7,7 +7,7 @@ export default function TermsPage() {
   return (
     <div className="pb-mobile-nav">
       <Header />
-      <main className="container main-content policy-page-content" style={{ padding: '120px 20px 100px', maxWidth: '800px', margin: '0 auto' }}>
+      <main className="container main-content policy-page-content" style={{ padding: '32px 16px 100px', maxWidth: '800px', margin: '0 auto' }}>
         <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '24px', color: 'var(--text-primary)' }}>
           TERMS & CONDITIONS
         </h1>

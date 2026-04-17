@@ -82,19 +82,6 @@ export default function EditProfileModal({
               />
             </div>
 
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>
-                <Calendar size={16} />
-                Date of Birth
-              </label>
-              <input
-                type="date"
-                name="dob"
-                value={formData.dob}
-                onChange={onChange}
-                className={styles.input}
-              />
-            </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>

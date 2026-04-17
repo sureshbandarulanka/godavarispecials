@@ -10,18 +10,12 @@ import { LocationProvider } from "@/context/LocationContext";
 import { CategoryProvider } from "@/context/CategoryContext";
 import { OfferProvider } from "@/context/OfferContext";
 import { ProductProvider } from "@/context/ProductContext";
-import LoginModal from "@/components/LoginModal";
-import CartDrawer from "@/components/CartDrawer";
-import StickyCartBar from "@/components/StickyCartBar";
-import MobileBottomNav from "@/components/MobileBottomNav";
-import Toast from "@/components/Toast";
-import MobileUILayer from "@/components/MobileUILayer";
-import SplashScreen from "@/components/SplashScreen";
-import AutoLoginPrompt from "@/components/AutoLoginPrompt";
-import NotificationPrompt from "@/components/NotificationPrompt";
-import LocationPrompt from "@/components/LocationPrompt";
 import AppStateProvider from "@/components/AppStateProvider";
+import GlobalUI from "@/components/GlobalUI";
+import MobileUILayer from "@/components/MobileUILayer";
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { getCategoriesAsync } from "@/services/productService";
+import { getActiveBanners } from "@/services/bannerService";
 
 // Load Inter with font-display: swap to avoid FOIT (Flash of Invisible Text)
 const inter = Inter({
@@ -32,8 +26,18 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://godavarispecials.in'),
-  title: "Godavari Specials",
-  description: "Authentic Homemade Foods",
+  title: {
+    default: "GS | Godavari Specials - Authentic Homemade Pickles & Sweets",
+    template: "%s | Godavari Specials"
+  },
+  description: "Order authentic homemade pickles (Avakaya, Chicken, Mutton), traditional sweets, and spices from Godavari. 100% natural, fresh, and delivered across India by GS.",
+  keywords: [
+    "GS", "Godavari Specials", "Godavari", "Telugu Foods", "Telugu Ruchulu",
+    "Godavari Ruchulu", "godavarispecials", "Telugu Specials", "Telugu Pickles",
+    "Pickles", "Pindi Vantalu", "Pindi Vantalu Online", "Sweets", "Telugu Sweets",
+    "Ghee", "Oils", "Natural Oils", "Healthy Food", "Healthy Organic Food",
+    "Organic Food", "GS Pickles", "GS Sweets", "Andhra Pickles", "Homemade Foods", "rajahmundry", "rjy", "rajamahendravaram", "andhra foods"
+  ],
   icons: {
     icon: "/assets/favicon.png",
     shortcut: "/assets/favicon.png",
@@ -44,8 +48,8 @@ export const metadata: Metadata = {
   creator: "Godavari Specials",
   publisher: "Godavari Specials",
   openGraph: {
-    title: "Godavari Specials",
-    description: "Authentic Homemade Foods",
+    title: "GS | Godavari Specials - Authentic Homemade Pickles & Sweets",
+    description: "Experience the real taste of Godavari with GS. Buy 100% homemade pickles, sweets, and podis online. Fresh quality, traditional recipes.",
     url: 'https://godavarispecials.in',
     siteName: 'Godavari Specials',
     images: [{ url: '/assets/favicon.png' }],
@@ -54,8 +58,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "Godavari Specials",
-    description: "Authentic Homemade Foods",
+    title: "Godavari Specials | Authentic Homemade Foods",
+    description: "Pure, fresh, and traditional Godavari tastes delivered to your doorstep.",
     images: ['/assets/favicon.png'],
   },
   verification: {
@@ -81,11 +85,19 @@ export const viewport = {
   themeColor: '#FFD700',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch global data on server to avoid client-side waterfalls
+  const [categories, banners] = await Promise.all([
+    getCategoriesAsync().catch(() => []),
+    getActiveBanners().catch(() => [])
+  ]);
+
+  const serializedCategories = JSON.parse(JSON.stringify(categories));
+  const serializedBanners = JSON.parse(JSON.stringify(banners));
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -99,24 +111,20 @@ export default function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
-          <AutoLoginPrompt />
           <LocationProvider>
             <CartProvider>
               <ProductProvider>
                 <OfferProvider>
-                  <CategoryProvider>
+                  <CategoryProvider initialCategories={serializedCategories}>
                     <AppStateProvider>
                       <div className="app-shell">
-                        <MobileUILayer />
+                        <MobileUILayer
+                          initialCategories={serializedCategories}
+                          initialBanners={serializedBanners}
+                        />
                         {children}
                       </div>
-                      <MobileBottomNav />
-                      <StickyCartBar />
-                      <LoginModal />
-                      <CartDrawer />
-                      <Toast />
-                      <NotificationPrompt />
-                      <LocationPrompt />
+                      <GlobalUI />
                     </AppStateProvider>
                   </CategoryProvider>
                 </OfferProvider>

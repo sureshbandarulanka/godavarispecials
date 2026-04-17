@@ -122,15 +122,15 @@ export default function MyOrdersPage() {
         <h1 className={styles.pageTitle}>My Orders</h1>
         
         {loading ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '100px 0' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '120px 0' }}>
             <div className="spinner"></div>
-            <p style={{ marginTop: '16px', color: '#64748b' }}>Fetching your orders...</p>
+            <p style={{ marginTop: '20px', color: '#64748b', fontWeight: 600 }}>Fetching your order history...</p>
           </div>
         ) : orders.length === 0 ? (
           <div className={styles.emptyState}>
-            <div className={styles.emptyIcon}>📦</div>
-            <h2 className={styles.emptyTitle}>No orders yet</h2>
-            <p className={styles.emptySubtitle}>You haven't placed any orders. Start exploring our delicious products!</p>
+            <div className={styles.emptyIcon}>🛍️</div>
+            <h2 className={styles.emptyTitle}>Your basket is empty</h2>
+            <p className={styles.emptySubtitle}>It seems you haven't placed any orders yet. Explore our authentic homemade specials!</p>
             <Link href="/" className="btn-shop">Start Shopping</Link>
           </div>
         ) : (
@@ -140,9 +140,13 @@ export default function MyOrdersPage() {
                 <div className={styles.cardHeader}>
                   <div className={styles.headerMain}>
                     <div className={styles.orderId}>Order #{order.orderId}</div>
-                    <div className={styles.orderDate}>{formatDate(order.createdAt || order.date || "")}</div>
+                    <div className={styles.orderDate}>
+                      <span style={{ verticalAlign: 'middle', marginRight: '4px' }}>📅</span>
+                      {formatDate(order.createdAt || order.date || "")}
+                    </div>
                   </div>
                   <div className={styles.statusBadge} style={{ backgroundColor: `${getStatusColor(order.status)}15`, color: getStatusColor(order.status) }}>
+                    <span style={{ fontSize: '10px', marginRight: '4px' }}>●</span>
                     {order.status}
                   </div>
                 </div>
@@ -154,47 +158,49 @@ export default function MyOrdersPage() {
                   </div>
                   <div className={styles.summaryItem}>
                     <span className={styles.label}>Items</span>
-                    <span className={styles.value}>{order.items.length} {order.items.length === 1 ? 'Item' : 'Items'}</span>
+                    <span className={styles.value}>{order.items.length} {order.items.length === 1 ? 'Product' : 'Products'}</span>
                   </div>
                 </div>
 
                 <div className={styles.cardActions}>
                   <button className={styles.btnDetails} onClick={() => toggleExpand(order.orderId)}>
                     {expandedOrders.includes(order.orderId) ? 'Hide Details' : 'View Details'}
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ transform: expandedOrders.includes(order.orderId) ? 'rotate(180deg)' : 'none', transition: '0.2s' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ transform: expandedOrders.includes(order.orderId) ? 'rotate(180deg)' : 'none', transition: '0.3s' }}>
                       <polyline points="6 9 12 15 18 9"></polyline>
                     </svg>
                   </button>
-                  <div style={{ display: 'flex', gap: '8px', marginLeft: 'auto' }}>
+                  
+                  <div className={styles.actionGroup}>
                     <button 
+                      className={styles.btnDetails}
                       onClick={() => handleDownload(order, 'INVOICE')}
-                      style={{ fontSize: '11px', padding: '6px 10px', background: '#f0f9ff', color: '#0369a1', border: '1px solid #bae6fd', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                      style={{ border: '1px solid #bae6fd', color: '#0369a1' }}
                     >
                       Invoice 📄
                     </button>
                     {order.status === 'Delivered' && (
                       <button 
+                        className={styles.btnDetails}
                         onClick={() => handleDownload(order, 'BILL')}
-                        style={{ fontSize: '11px', padding: '6px 10px', background: '#f0fdf4', color: '#15803d', border: '1px solid #dcfce7', borderRadius: '6px', cursor: 'pointer', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}
+                        style={{ border: '1px solid #dcfce7', color: '#15803d' }}
                       >
                         Bill ✅
                       </button>
                     )}
+                    {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
+                      <button className={styles.btnTrack} onClick={() => router.push(`/track-order/${order.id || order.orderId}`)}>
+                        Track
+                      </button>
+                    )}
                   </div>
-                  {order.status !== 'Delivered' && order.status !== 'Cancelled' && (
-                    <button className={styles.btnTrack} onClick={() => router.push(`/track-order/${order.id || order.orderId}`)}>
-                      Track Order
-                    </button>
-                  )}
                 </div>
 
                 {expandedOrders.includes(order.orderId) && (
                   <div className={styles.detailsSection}>
-                    <div className={styles.divider}></div>
                     <div className={styles.itemsList}>
                       {order.items.map((item, idx) => (
                         <div key={idx} className={styles.itemRow}>
-                          <span className={styles.itemQty}>{item.quantity}x</span>
+                          <span className={styles.itemQty}>{item.quantity}</span>
                           <span className={styles.itemName}>{item.name || item.product?.name}</span>
                           <span className={styles.itemPrice}>₹{(item.price || item.product?.price || 0) * item.quantity}</span>
                         </div>
@@ -202,11 +208,11 @@ export default function MyOrdersPage() {
                     </div>
                     <div className={styles.deliveryInfo}>
                       <div className={styles.infoRow}>
-                        <span className={styles.infoLabel}>Delivery Address:</span>
+                        <span className={styles.infoLabel}>Address</span>
                         <span className={styles.infoValue}>{order.address.address}, {order.address.pincode}</span>
                       </div>
                       <div className={styles.infoRow}>
-                        <span className={styles.infoLabel}>Payment Method:</span>
+                        <span className={styles.infoLabel}>Payment</span>
                         <span className={styles.infoValue}>{order.paymentMethod}</span>
                       </div>
                     </div>

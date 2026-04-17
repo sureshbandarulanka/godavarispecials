@@ -18,13 +18,20 @@ interface CategoryContextType {
   categories: Category[];
   loading: boolean;
   error: Error | null;
+  setCategories: (categories: Category[]) => void;
 }
 
 const CategoryContext = createContext<CategoryContextType | undefined>(undefined);
 
-export const CategoryProvider = ({ children }: { children: React.ReactNode }) => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+export const CategoryProvider = ({ 
+  children, 
+  initialCategories = [] 
+}: { 
+  children: React.ReactNode, 
+  initialCategories?: Category[] 
+}) => {
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [loading, setLoading] = useState(initialCategories.length === 0);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
@@ -64,7 +71,7 @@ export const CategoryProvider = ({ children }: { children: React.ReactNode }) =>
   }, []);
 
   return (
-    <CategoryContext.Provider value={{ categories, loading, error }}>
+    <CategoryContext.Provider value={{ categories, loading, error, setCategories }}>
       {children}
     </CategoryContext.Provider>
   );

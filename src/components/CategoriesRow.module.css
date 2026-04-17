@@ -1,13 +1,12 @@
 
 .categories-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  align-items: flex-start;
-  gap: 14px;
-  row-gap: 24px;
-  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 12px;
+  row-gap: 36px;
+  margin-top: 24px;
   padding-top: 12px;
+  width: 100%;
 }
 
 .categories-container::-webkit-scrollbar {
@@ -15,8 +14,7 @@
 }
 
 .categoryCard {
-  flex: 0 0 auto;
-  width: 82px;
+  width: 100%;
   text-align: center;
   padding: 8px 4px;
   border-radius: 14px;
@@ -38,7 +36,7 @@
 
 @media (min-width: 768px) {
   .categoryCard {
-    width: 96px;
+    width: 100%;
   }
 }
 
