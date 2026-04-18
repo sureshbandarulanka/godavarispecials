@@ -301,24 +301,13 @@ export default function ProductClient({
                   <span className={`${styles.accordionIcon} ${isDescOpen ? styles.accordionIconActive : ''}`}>▼</span>
                 </div>
                 {isDescOpen && (
-                  <div className={styles.accordionContent}>
-                    {product.name} is authentically prepared with premium quality ingredients following traditional recipes from Godavari districts. Perfect for your daily meals or special occasions.
+                  <div className={styles.accordionContent} style={{ whiteSpace: 'pre-wrap' }}>
+                    {product.description || `${product.name} is authentically prepared with premium quality ingredients following traditional recipes from Godavari districts. Perfect for your daily meals or special occasions.`}
                   </div>
                 )}
               </div>
               
 
-              <div className={styles.accordionItem}>
-                <div className={styles.accordionHeader} onClick={() => setIsShelfOpen(!isShelfOpen)}>
-                  <span className={styles.accordionTitle}>Shelf Life</span>
-                  <span className={`${styles.accordionIcon} ${isShelfOpen ? styles.accordionIconActive : ''}`}>▼</span>
-                </div>
-                {isShelfOpen && (
-                  <div className={styles.accordionContent}>
-                    Best before 3 months from the date of manufacturing. Store in a cool, dry place. Always use a dry spoon.
-                  </div>
-                )}
-              </div>
             </div>
 
           </div>

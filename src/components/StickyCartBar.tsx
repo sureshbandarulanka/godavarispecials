@@ -29,9 +29,12 @@ export default function StickyCartBar() {
 
   if (cartItems.length === 0 || isCartOpen || pathname === '/checkout') return null;
 
+  const isProductPage = pathname?.startsWith('/product/');
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
     <div 
-      className={styles.stickyBar}
+      className={`${styles.stickyBar} ${isProductPage ? styles.productPageStickyBar : ''}`}
       onClick={openCart}
       role="button"
     >

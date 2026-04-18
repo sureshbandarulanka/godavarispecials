@@ -515,10 +515,20 @@ export const getCategoriesAsync = async () => {
   try {
     const categoriesQuery = query(collection(db, "categories"), orderBy("name", "asc"));
     const querySnapshot = await getDocs(categoriesQuery);
-    return querySnapshot.docs.map(doc => ({
+    const categories = querySnapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data()
-    })) as { id: string; name: string; slug: string; imageUrl?: string }[];
+    })) as any[];
+
+    // Apply the same custom sort as CategoryContext to prevent layout jumps
+    return categories.sort((a, b) => {
+      if (a.order !== undefined && b.order !== undefined) {
+        return a.order - b.order;
+      }
+      if (a.order !== undefined) return -1;
+      if (b.order !== undefined) return 1;
+      return a.name.localeCompare(b.name);
+    });
   } catch (error) {
     console.error("Error fetching categories:", error);
     throw error;

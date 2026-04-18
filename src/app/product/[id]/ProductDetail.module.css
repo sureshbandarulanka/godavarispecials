@@ -501,14 +501,19 @@
   }
 
   .mainImageContainer {
-    aspect-ratio: 1 / 0.8 !important; /* Reduced height (wider rectangle) */
+    aspect-ratio: 1 / 1 !important; /* Square for 800x800 images */
     width: 100% !important;
     height: auto !important;
     min-height: auto !important;
-    padding: 0 !important; /* Spread fully to edges */
+    padding: 0 !important;
     margin-bottom: 8px;
     border-radius: 12px;
     overflow: hidden;
+    background: #fff;
+  }
+
+  .mainImage {
+    object-fit: contain !important; /* See whole image */
   }
 
   .scrollContainer {
