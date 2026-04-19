@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getProducts, fetchFirebaseData, deleteProduct, deleteProductsBulk } from '@/services/productService';
+import { getProducts, fetchFirebaseData, deleteProduct, deleteProductsBulk, restoreProductAsync, emptyBinAsync } from '@/services/productService';
+import { Archive, RotateCcw, Trash2 } from 'lucide-react';
 import { Product } from '@/data/products';
 
 export default function AdminProductsPage() {
@@ -11,6 +12,7 @@ export default function AdminProductsPage() {
   const [deleteId, setDeleteId] = useState<string | number | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
 
   // Bulk Selection State
   const [selectedIds, setSelectedIds] = useState<(string | number)[]>([]);
@@ -62,11 +64,34 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleRestore = async (id: string | number) => {
+    try {
+      await restoreProductAsync(id.toString());
+      setToast('Product restored successfully!');
+      await loadData();
+    } catch (err) {
+      alert('Failed to restore product');
+    }
+  };
+
+  const handleEmptyBin = async () => {
+    if (!window.confirm("Are you sure you want to PERMANENTLY delete all products in the Recycle Bin?")) return;
+    try {
+      await emptyBinAsync("products");
+      setToast("Recycle Bin emptied");
+      await loadData();
+    } catch (err) {
+      alert("Failed to empty bin");
+    }
+  };
+
+  const filteredProducts = products.filter(p => activeTab === 'active' ? !p.isDeleted : p.isDeleted);
+
   const toggleSelectAll = () => {
-    if (selectedIds.length === products.length) {
+    if (selectedIds.length === filteredProducts.length) {
       setSelectedIds([]);
     } else {
-      setSelectedIds(products.map(p => p.id));
+      setSelectedIds(filteredProducts.map(p => p.id));
     }
   };
 
@@ -106,9 +131,32 @@ export default function AdminProductsPage() {
       )}
 
       <div className="admin-card">
-        <div className="admin-card-header">
-          <h2 className="admin-card-title">Products ({products.length})</h2>
+        <div className="admin-card-header" style={{ borderBottom: 'none' }}>
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button 
+              className={`tab-btn ${activeTab === 'active' ? 'active' : ''}`}
+              onClick={() => setActiveTab('active')}
+            >
+              Active Products ({products.filter(p => !p.isDeleted).length})
+            </button>
+            <button 
+              className={`tab-btn ${activeTab === 'deleted' ? 'active' : ''}`}
+              onClick={() => setActiveTab('deleted')}
+              style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              <Archive size={16} /> Recycle Bin ({products.filter(p => p.isDeleted).length})
+            </button>
+          </div>
           <div style={{ display: 'flex', gap: '12px' }}>
+             {activeTab === 'deleted' && products.some(p => p.isDeleted) && (
+              <button 
+                className="btn-secondary" 
+                onClick={handleEmptyBin}
+                style={{ background: '#fee2e2', color: '#ef4444', borderColor: '#fecaca' }}
+              >
+                Empty Bin
+              </button>
+            )}
             <Link href="/admin/products/bulk-upload" className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
               Bulk Upload
@@ -152,8 +200,8 @@ export default function AdminProductsPage() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product.id} className={selectedIds.includes(product.id) ? 'row-selected' : ''}>
+                {filteredProducts.map((product) => (
+                  <tr key={product.id} className={`${selectedIds.includes(product.id) ? 'row-selected' : ''}`} style={{ opacity: product.isDeleted ? 0.7 : 1 }}>
                     <td>
                       <input 
                         type="checkbox" 
@@ -175,6 +223,21 @@ export default function AdminProductsPage() {
                         <div>
                           <div style={{ fontWeight: 600 }}>{product.name}</div>
                           <div style={{ fontSize: '12px', color: '#64748b' }}>ID: {product.id}</div>
+                          {product.isOutOfStock && (
+                            <span style={{ 
+                              fontSize: '10px', 
+                              background: '#fef2f2', 
+                              color: '#ef4444', 
+                              padding: '2px 6px', 
+                              borderRadius: '4px', 
+                              fontWeight: 700,
+                              border: '1px solid #fee2e2',
+                              display: 'inline-block',
+                              marginTop: '4px'
+                            }}>
+                              OUT OF STOCK
+                            </span>
+                          )}
                         </div>
                       </div>
                     </td>
@@ -184,16 +247,29 @@ export default function AdminProductsPage() {
                     <td>{getMinPrice(product)}</td>
                     <td>
                       <div className="actions-cell">
-                        <Link href={`/admin/products/edit/${product.id}`} className="btn-icon" title="Edit">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
-                        </Link>
-                        <button 
-                          className="btn-icon delete" 
-                          title="Delete"
-                          onClick={() => setDeleteId(product.id)}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        </button>
+                        {!product.isDeleted ? (
+                          <>
+                            <Link href={`/admin/products/edit/${product.id}`} className="btn-icon" title="Edit">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>
+                            </Link>
+                            <button 
+                              className="btn-icon delete" 
+                              title="Delete"
+                              onClick={() => setDeleteId(product.id)}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                            </button>
+                          </>
+                        ) : (
+                          <button 
+                            className="btn-icon" 
+                            title="Restore"
+                            onClick={() => handleRestore(product.id)}
+                            style={{ color: '#10b981' }}
+                          >
+                            <RotateCcw size={18} />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -326,6 +402,23 @@ export default function AdminProductsPage() {
 
         .row-selected {
           background-color: #f1f5f9;
+        }
+
+        .tab-btn {
+          padding: 8px 16px;
+          border: none;
+          background: none;
+          color: #64748b;
+          font-weight: 600;
+          cursor: pointer;
+          border-bottom: 2px solid transparent;
+          transition: all 0.2s;
+        }
+        .tab-btn.active {
+          color: #3b82f6;
+          border-bottom-color: #3b82f6;
+          background: #eff6ff;
+          border-radius: 8px 8px 0 0;
         }
       `}</style>
     </div>

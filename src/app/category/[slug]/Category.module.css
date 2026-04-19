@@ -256,6 +256,15 @@
     padding: 0 !important;
   }
   
+  .header {
+    padding: 0 16px 12px; /* Added horizontal padding for mobile */
+    margin-top: 12px;
+  }
+
+  .titleArea {
+    align-items: center; /* Better alignment for title and count on mobile */
+  }
+  
   .grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -303,11 +312,13 @@
   transform: translateY(-1px);
 }
 
-.subCategoryBtnActive {
+.subCategoryBtnActive,
+.subCategoryBtnActive:hover {
   background: var(--brand-blue);
   border-color: var(--brand-blue);
-  color: white;
+  color: white !important;
   box-shadow: 0 4px 12px rgba(52, 114, 186, 0.25);
+  transform: translateY(0);
 }
 
 .subCategoryIcon {
@@ -324,18 +335,16 @@
   }
   
   .subCategoryBtn {
-    padding: 6px 10px;
-    font-size: clamp(9px, 2.8vw, 11px);
-    flex: 0 1 auto;
+    padding: 6px 12px;
+    font-size: clamp(10px, 3vw, 12px);
+    flex: 0 0 auto;
     width: auto;
     gap: 4px;
-    border-width: 1px;
-    border-radius: 8px;
+    border-width: 1.5px;
+    border-radius: 99px; /* Keep pill shape on mobile */
     justify-content: center;
     text-align: center;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
     box-shadow: 0 1px 4px rgba(0,0,0,0.03);
   }
   

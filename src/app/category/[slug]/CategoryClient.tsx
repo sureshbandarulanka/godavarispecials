@@ -132,32 +132,8 @@ export default function CategoryClient({ slug }: { slug: string }) {
             </div>
           </div>
 
-          {/* Sub-Category Buttons for Pickles */}
-          {decodedCategory.toLowerCase() === 'pickles' && (
-            <div className={styles.subCategoryContainer}>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'all' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('all')}
-              >
-                All Pickles
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'veg' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('veg')}
-              >
-                <span className={styles.subCategoryIcon}>🟢</span> Veg Pickles
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'nonveg' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('nonveg')}
-              >
-                <span className={styles.subCategoryIcon}>🔴</span> Non-Veg Pickles
-              </button>
-            </div>
-          )}
-
-          {/* Sub-Category Buttons for Sweets */}
-          {decodedCategory.toLowerCase() === 'sweets' && (
+          {/* Sub-Category Filters (Dynamic based on Category Types) */}
+          {targetCategory?.types && targetCategory.types.length > 0 && (
             <div className={styles.subCategoryContainer}>
               <button 
                 className={`${styles.subCategoryBtn} ${typeFilter === 'all' ? styles.subCategoryBtnActive : ''}`}
@@ -165,72 +141,20 @@ export default function CategoryClient({ slug }: { slug: string }) {
               >
                 All Items
               </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'pindi-vantalu' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('pindi-vantalu')}
-              >
-                Pindi Vantalu
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'sweet' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('sweet')}
-              >
-                Sweets
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'hot-snacks' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('hot-snacks')}
-              >
-                Hot Snacks
-              </button>
-            </div>
-          )}
-
-          {/* Sub-Category Buttons for Authentic Podis */}
-          {decodedCategory.toLowerCase() === 'authentic podis' && (
-            <div className={styles.subCategoryContainer}>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'all' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('all')}
-              >
-                All Podis
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'veg' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('veg')}
-              >
-                <span className={styles.subCategoryIcon}>🟢</span> Veg Podis
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'nonveg' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('nonveg')}
-              >
-                <span className={styles.subCategoryIcon}>🔴</span> Non-Veg Podis
-              </button>
-            </div>
-          )}
-
-          {/* Sub-Category Buttons for Ghee & Oils */}
-          {(decodedCategory.toLowerCase() === 'ghee & oils' || decodedCategory.toLowerCase() === 'ghee' || decodedCategory.toLowerCase() === 'oils') && (
-            <div className={styles.subCategoryContainer}>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'all' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('all')}
-              >
-                All Items
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'ghee' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('ghee')}
-              >
-                Pure Ghee
-              </button>
-              <button 
-                className={`${styles.subCategoryBtn} ${typeFilter === 'oil' ? styles.subCategoryBtnActive : ''}`}
-                onClick={() => setTypeFilter('oil')}
-              >
-                Cold Pressed Oils
-              </button>
+              {targetCategory.types.map((type) => (
+                <button 
+                  key={type}
+                  className={`${styles.subCategoryBtn} ${typeFilter === type ? styles.subCategoryBtnActive : ''}`}
+                  onClick={() => setTypeFilter(type)}
+                >
+                  {type.toLowerCase().includes('veg') && !type.toLowerCase().includes('non') ? (
+                    <span className={styles.subCategoryIcon}>🟢</span>
+                  ) : type.toLowerCase().includes('non-veg') ? (
+                    <span className={styles.subCategoryIcon}>🔴</span>
+                  ) : null}
+                  {type}
+                </button>
+              ))}
             </div>
           )}
 

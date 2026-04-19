@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   User as FirebaseUser
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs } from "firebase/firestore";
 
 export interface UserData {
   uid: string;
@@ -92,3 +92,10 @@ export const logout = async () => {
   await signOut(auth);
 };
 
+/**
+ * Get all users from Firestore
+ */
+export const getUsersAsync = async () => {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  return querySnapshot.docs.map(doc => doc.data() as UserData);
+};

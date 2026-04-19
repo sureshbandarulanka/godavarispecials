@@ -10,6 +10,8 @@ export default function AddCategoryPage() {
   const router = useRouter();
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
+  const [types, setTypes] = useState<string[]>([]);
+  const [newType, setNewType] = useState('');
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -64,7 +66,8 @@ export default function AddCategoryPage() {
       await addCategory({ 
         name: name.trim(), 
         slug, 
-        imageUrl 
+        imageUrl,
+        types
       });
       setToast('Category added successfully!');
       setTimeout(() => {
@@ -120,6 +123,59 @@ export default function AddCategoryPage() {
               />
               <span style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
                 Max size: 10MB. (Auto-compressed for fast loading).
+              </span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Product Types / Filters</label>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                <input 
+                  type="text" 
+                  className="form-input" 
+                  value={newType}
+                  onChange={(e) => setNewType(e.target.value)}
+                  placeholder="e.g. Veg Pickles"
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), setTypes([...types, newType.trim()]), setNewType(''))}
+                />
+                <button 
+                  type="button" 
+                  className="btn-primary" 
+                  onClick={() => {
+                    if (newType.trim() && !types.includes(newType.trim())) {
+                      setTypes([...types, newType.trim()]);
+                      setNewType('');
+                    }
+                  }}
+                >
+                  Add
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                {types.map((type, idx) => (
+                  <div key={idx} style={{ 
+                    background: '#eff6ff', 
+                    color: '#3b82f6', 
+                    padding: '4px 12px', 
+                    borderRadius: '99px', 
+                    fontSize: '13px', 
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    {type}
+                    <button 
+                      type="button" 
+                      onClick={() => setTypes(types.filter((_, i) => i !== idx))}
+                      style={{ border: 'none', background: 'none', color: '#3b82f6', cursor: 'pointer', fontSize: '16px', display: 'flex' }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <span style={{ fontSize: '12px', color: '#94a3b8', marginTop: '8px' }}>
+                Add specific sub-categories or types for this category.
               </span>
             </div>
 

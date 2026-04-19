@@ -14,7 +14,46 @@ import { useOffers } from '@/context/OfferContext';
 import { useCountdown } from '@/hooks/useCountdown';
 import { Product } from '@/data/products';
 import JsonLd, { getProductSchema } from '@/components/JsonLd';
+import { Bell } from 'lucide-react';
 import styles from './ProductDetail.module.css';
+import { useAuth } from '@/context/AuthContext';
+
+function Toast({ message, onClose }: { message: string, onClose: () => void }) {
+  React.useEffect(() => {
+    const timer = setTimeout(onClose, 2000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <div style={{
+      position: 'fixed',
+      bottom: '100px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: '#0f172a',
+      color: 'white',
+      padding: '12px 24px',
+      borderRadius: '50px',
+      fontSize: '14px',
+      fontWeight: 600,
+      boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)',
+      zIndex: 3000,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '8px',
+      animation: 'slideUp 0.3s ease-out'
+    }}>
+      {message}
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translate(-50%, 20px); }
+          to { opacity: 1; transform: translate(-50%, 0); }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 
 function ActiveOfferDisplay({ offer }: { offer: any }) {
   const { timeLeft, isUrgent, isExpired } = useCountdown(offer.endDate);
@@ -47,6 +86,7 @@ export default function ProductClient({
   const { cartItems, addToCart, removeFromCart, updateQuantity } = useCart();
   const { location, shippingRule } = useLocation();
   const { getOfferForProduct } = useOffers();
+  const { user, openLoginModal } = useAuth();
   
   const activeOffer = useMemo(() => {
     return getOfferForProduct(id);
@@ -60,6 +100,8 @@ export default function ProductClient({
   
   const [isDescOpen, setIsDescOpen] = useState(true);
   const [isShelfOpen, setIsShelfOpen] = useState(false);
+  const [isNotified, setIsNotified] = useState(false);
+  const [isNotifyLoading, setIsNotifyLoading] = useState(false);
   
   const [selectedVariant, setSelectedVariant] = useState<any>(initialProduct?.variants?.[0] || null);
 
@@ -161,6 +203,33 @@ export default function ProductClient({
   };
   const pricePerKg = getPricePerKg();
 
+  const handleNotify = async () => {
+    if (!user) {
+      openLoginModal();
+      return;
+    }
+    
+    setIsNotifyLoading(true);
+    try {
+      const res = await fetch('/api/notify-stock', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          email: user.email, 
+          productName: product.name, 
+          productId: product.id.toString() 
+        })
+      });
+      if (res.ok) {
+        setIsNotified(true);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsNotifyLoading(false);
+    }
+  };
+
   return (
     <div className="pb-mobile-nav main-content">
       <JsonLd data={getProductSchema(product, activeOffer)} />
@@ -173,6 +242,23 @@ export default function ProductClient({
         <div className={styles.productLayout}>
           <div className={styles.imageSection}>
             <div className={styles.mainImageContainer}>
+              {product.isOutOfStock && (
+                <div style={{
+                  position: 'absolute',
+                  top: '20px',
+                  left: '20px',
+                  background: '#0f172a',
+                  color: 'white',
+                  padding: '6px 14px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  fontWeight: 800,
+                  zIndex: 20,
+                  letterSpacing: '0.5px'
+                }}>
+                  OUT OF STOCK
+                </div>
+              )}
               {product.image ? (
                 <Image 
                   src={mainImage} 
@@ -248,10 +334,32 @@ export default function ProductClient({
 
             <div className={styles.actionSection}>
               <div className={styles.actionButtons}>
-                {quantity === 0 ? (
+                {product.isOutOfStock ? (
+                  <button 
+                    className={styles.btnNotify} 
+                    disabled={isNotifyLoading || isNotified}
+                    onClick={handleNotify}
+                    style={{
+                      flex: 1,
+                      background: isNotified ? '#f0fdf4' : '#fef2f2',
+                      color: isNotified ? '#22c55e' : '#ef4444',
+                      border: isNotified ? '2px solid #dcfce7' : '2px solid #fee2e2',
+                      borderRadius: '16px',
+                      padding: '16px',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Bell size={20} /> {isNotifyLoading ? '...' : isNotified ? 'NOTIFIED SUCCESSFULLY ✅' : 'NOTIFY ME WHEN AVAILABLE'}
+                  </button>
+                ) : quantity === 0 ? (
                   <button 
                     className={styles.btnAdd} 
-                    onClick={() => currentPrice !== null && addToCart(product, selectedVariant!.weight, currentPrice)}
+                    onClick={() => currentPrice !== null && product && addToCart(product, selectedVariant!.weight, currentPrice)}
                     disabled={currentPrice === null}
                   >
                     ADD TO CART
@@ -263,19 +371,21 @@ export default function ProductClient({
                     <button className={styles.qtyBtn} onClick={() => updateQuantity(product.id, selectedVariant!.weight, quantity + 1)}>+</button>
                   </div>
                 )}
-                <button 
-                  className={styles.btnBuyNow} 
-                  onClick={() => {
-                    if (currentPrice === null) return;
-                    if (quantity === 0) {
-                      addToCart(product, selectedVariant!.weight, currentPrice);
-                    }
-                    router.push('/checkout');
-                  }}
-                  disabled={currentPrice === null}
-                >
-                  BUY NOW
-                </button>
+                {!product.isOutOfStock && (
+                  <button 
+                    className={styles.btnBuyNow} 
+                    onClick={() => {
+                      if (currentPrice === null || !product) return;
+                      if (quantity === 0) {
+                        addToCart(product, selectedVariant!.weight, currentPrice);
+                      }
+                      router.push('/checkout');
+                    }}
+                    disabled={currentPrice === null}
+                  >
+                    BUY NOW
+                  </button>
+                )}
               </div>
             </div>
 
@@ -315,33 +425,62 @@ export default function ProductClient({
 
         {/* MOBILE ONLY: Fixed Bottom Action Bar */}
         <div className={styles.mobileActionContainer}>
-          {quantity === 0 ? (
+          {product.isOutOfStock ? (
             <button
-              className={styles.mobileAddToCart}
-              onClick={() => currentPrice !== null && addToCart(product, selectedVariant!.weight, currentPrice)}
-              disabled={currentPrice === null}
+              className={styles.mobileNotifyMe}
+              disabled={isNotifyLoading || isNotified}
+              onClick={handleNotify}
+              style={{
+                width: '100%',
+                background: isNotified ? '#22c55e' : '#ef4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '12px',
+                padding: '14px',
+                fontWeight: 800,
+                fontSize: '14px'
+              }}
             >
-              Add to Cart
+              {isNotifyLoading ? 'Processing...' : isNotified ? 'Notified Successfully ✓' : 'Notify Me When Available'}
             </button>
           ) : (
-            <div className={styles.mobileQtyControl}>
-              <button onClick={() => updateQuantity(product.id, selectedVariant!.weight, quantity - 1)}>−</button>
-              <span>{quantity}</span>
-              <button onClick={() => updateQuantity(product.id, selectedVariant!.weight, quantity + 1)}>+</button>
-            </div>
+            <>
+              {quantity === 0 ? (
+                <button
+                  className={styles.mobileAddToCart}
+                  onClick={() => currentPrice !== null && product && addToCart(product, selectedVariant!.weight, currentPrice)}
+                  disabled={currentPrice === null}
+                >
+                  Add to Cart
+                </button>
+              ) : (
+                <div className={styles.mobileQtyControl}>
+                  <button onClick={() => updateQuantity(product.id, selectedVariant!.weight, quantity - 1)}>−</button>
+                  <span>{quantity}</span>
+                  <button onClick={() => updateQuantity(product.id, selectedVariant!.weight, quantity + 1)}>+</button>
+                </div>
+              )}
+              <button
+                className={styles.mobileBuyNow}
+                onClick={() => {
+                  if (currentPrice === null || !product) return;
+                  if (quantity === 0) addToCart(product, selectedVariant!.weight, currentPrice);
+                  router.push('/checkout');
+                }}
+                disabled={currentPrice === null}
+              >
+                Buy Now
+              </button>
+            </>
           )}
-          <button
-            className={styles.mobileBuyNow}
-            onClick={() => {
-              if (currentPrice === null) return;
-              if (quantity === 0) addToCart(product, selectedVariant!.weight, currentPrice);
-              router.push('/checkout');
-            }}
-            disabled={currentPrice === null}
-          >
-            Buy Now
-          </button>
         </div>
+
+        {isNotified && (
+          <Toast 
+            message="Notified Successfully!" 
+            onClose={() => setIsNotified(false)} 
+          />
+        )}
 
         {similarProducts.length > 0 && (
           <div className={styles.recommendations}>

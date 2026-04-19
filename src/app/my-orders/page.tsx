@@ -107,7 +107,8 @@ export default function MyOrdersPage() {
       case 'Delivered': return '#10b981';
       case 'Cancelled': return '#ef4444';
       case 'Out for Delivery': return '#14b8a6';
-      case 'Shipped': return '#a855f7';
+      case 'Dispatched': return '#a855f7';
+      case 'Preparation': return '#b45309';
       case 'Confirmed': return '#3b82f6';
       case 'Placed': return '#f97316';
       default: return '#64748b';

@@ -26,7 +26,7 @@ export default function Header() {
   const { location, isDetecting, isHydrated } = useLocation();
   const mounted = useClientMount();
   // Show stable default until client has read localStorage (matches SSR default)
-  const displayCity = (mounted && isHydrated) ? location.city : 'Hyderabad';
+  const displayCity = (mounted && isHydrated) ? location.city : 'Loading...';
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isPopping, setIsPopping] = useState(false);

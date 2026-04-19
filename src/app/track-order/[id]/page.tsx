@@ -7,12 +7,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { Circle, Package, Truck, Clock, CheckCircle, MapPin, AlertCircle } from 'lucide-react';
 import styles from '../TrackOrder.module.css';
 
-const STATUS_STEPS = ['Placed', 'Confirmed', 'Shipped', 'Out for Delivery', 'Delivered'];
+const STATUS_STEPS = ['Placed', 'Confirmed', 'Preparation', 'Dispatched', 'Out for Delivery', 'Delivered'];
 
 const STATUS_MESSAGES: Record<string, string> = {
   'Placed': "Your order has been placed successfully",
   'Confirmed': "Your order is confirmed",
-  'Shipped': "Your order has been shipped",
+  'Preparation': "Your order is being prepared with love ❤️",
+  'Dispatched': "Your order has been dispatched",
   'Out for Delivery': "Your order is out for delivery 🚚",
   'Delivered': "Order delivered successfully 🎉",
   'Cancelled': "This order has been cancelled"

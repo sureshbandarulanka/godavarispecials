@@ -5,6 +5,21 @@ import { useRouter } from 'next/navigation';
 import { addProduct, fetchFirebaseData, uploadProductImage, updateProduct } from '@/services/productService';
 import { useCategories } from '@/context/CategoryContext';
 import Link from 'next/link';
+import { 
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import SortableImageItem from '@/components/admin/SortableImageItem';
 
 interface Variant {
   weight: string;
@@ -24,6 +39,7 @@ export default function AddProductPage() {
     category: '',
     description: '',
     type: 'veg' as 'veg' | 'non-veg' | 'sweet' | 'pindi-vantalu' | 'hot-snacks' | 'ghee' | 'oil',
+    isOutOfStock: false,
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -32,6 +48,25 @@ export default function AddProductPage() {
   const [variants, setVariants] = useState<Variant[]>([
     { weight: '250g', price: 0 }
   ]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = previewUrls.indexOf(active.id);
+      const newIndex = previewUrls.indexOf(over.id);
+
+      setPreviewUrls((items) => arrayMove(items, oldIndex, newIndex));
+      setSelectedFiles((items) => arrayMove(items, oldIndex, newIndex));
+    }
+  };
 
   // Remove old getCategories useEffect
 
@@ -187,15 +222,43 @@ export default function AddProductPage() {
                   value={formData.type}
                   onChange={handleInputChange}
                 >
-                  <option value="veg">Veg</option>
-                  <option value="non-veg">Non-Veg</option>
-                  <option value="sweet">Sweet</option>
-                  <option value="pindi-vantalu">Pindi Vantalu</option>
-                  <option value="hot-snacks">Hot Snacks</option>
-                  <option value="ghee">Ghee</option>
-                  <option value="oil">Oil</option>
+                  <option value="">Select Type</option>
+                  {/* Show category specific types if available */}
+                  {categories.find(c => c.name === formData.category)?.types?.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  )) || (
+                    <>
+                      <option value="veg">Veg</option>
+                      <option value="non-veg">Non-Veg</option>
+                      <option value="sweet">Sweet</option>
+                      <option value="pindi-vantalu">Pindi Vantalu</option>
+                      <option value="hot-snacks">Hot Snacks</option>
+                      <option value="ghee">Ghee</option>
+                      <option value="oil">Oil</option>
+                    </>
+                  )}
                 </select>
               </div>
+              <div className="form-group">
+                <label className="form-label">Availability</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', height: '44px' }}>
+                  <label className="switch">
+                    <input 
+                      type="checkbox" 
+                      name="isOutOfStock"
+                      checked={formData.isOutOfStock}
+                      onChange={(e) => setFormData({ ...formData, isOutOfStock: e.target.checked })}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: formData.isOutOfStock ? '#ef4444' : '#10b981' }}>
+                    {formData.isOutOfStock ? 'Out of Stock' : 'In Stock'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Product Images (Multiple)</label>
                 <div className="multi-upload-container">
@@ -209,19 +272,27 @@ export default function AddProductPage() {
                   </div>
 
                   <div className="upload-previews-grid">
-                    {previewUrls.map((url, idx) => (
-                      <div key={idx} className="preview-item">
-                        <img src={url} alt={`Preview ${idx + 1}`} />
-                        <button 
-                          type="button" 
-                          className="remove-preview" 
-                          onClick={(e) => { e.stopPropagation(); removeFile(idx); }}
-                        >
-                          ×
-                        </button>
-                        {idx === 0 && <span className="primary-badge">Main</span>}
-                      </div>
-                    ))}
+                    <DndContext 
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext 
+                        items={previewUrls}
+                        strategy={rectSortingStrategy}
+                      >
+                        {previewUrls.map((url, idx) => (
+                          <SortableImageItem 
+                            key={url} 
+                            id={url} 
+                            url={url} 
+                            index={idx} 
+                            onRemove={removeFile}
+                            isMain={idx === 0}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
                   </div>
 
                   {uploading && (

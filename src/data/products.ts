@@ -21,9 +21,11 @@ export interface Product {
   images?: string[];
   variants: ProductVariant[];
   stock?: number;
+  isOutOfStock?: boolean;
   isActive?: boolean;
   startDate?: string | Date | null;
   endDate?: string | Date | null;
+  isDeleted?: boolean;
 }
 
 export const CATEGORIES: string[] = [];

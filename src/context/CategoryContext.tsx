@@ -11,6 +11,7 @@ export interface Category {
   imageUrl?: string;
   tag?: string;
   order?: number;
+  types?: string[]; // Custom filters for this category
   createdAt?: any;
 }
 

@@ -69,7 +69,7 @@ export const getProducts = (): Product[] => {
 // 🔥 CATEGORY CRUD OPERATIONS
 
 // ✅ Add Category
-export const addCategory = async (category: { name: string, slug: string, imageUrl?: string, order?: number }) => {
+export const addCategory = async (category: { name: string, slug: string, imageUrl?: string, order?: number, types?: string[] }) => {
   try {
     // If order is not provided, we should ideally put it at the end
     // But for simplicity, we'll let the context sorting handle it or 
@@ -100,13 +100,53 @@ export const updateCategoryOrder = async (orderedIds: string[]) => {
   }
 };
 
-// ✅ Delete Category
+// ✅ Delete Category (Soft Delete)
 export const deleteCategory = async (id: string) => {
   try {
     const docRef = doc(db, "categories", id);
-    await deleteDoc(docRef);
+    await updateDoc(docRef, { isDeleted: true, updatedAt: serverTimestamp() });
   } catch (error) {
     console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+
+// ✅ Restore Category
+export const restoreCategoryAsync = async (id: string) => {
+  try {
+    const docRef = doc(db, "categories", id);
+    await updateDoc(docRef, { isDeleted: false, updatedAt: serverTimestamp() });
+  } catch (error) {
+    console.error("Error restoring category:", error);
+    throw error;
+  }
+};
+
+// ✅ Get Category by ID (Async)
+export const getCategoryByIdAsync = async (id: string) => {
+  try {
+    const docRef = doc(db, "categories", id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() } as any;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error fetching category:", error);
+    throw error;
+  }
+};
+
+// ✅ Update Category
+export const updateCategory = async (id: string, category: any) => {
+  try {
+    const docRef = doc(db, "categories", id);
+    await updateDoc(docRef, {
+      ...category,
+      updatedAt: serverTimestamp()
+    });
+  } catch (error) {
+    console.error("Error updating category:", error);
     throw error;
   }
 };
@@ -276,21 +316,22 @@ export const updateOrderStatusAsync = async (
     // 🚦 Transition Validation Logic (STRICT sequential flow)
     const ALLOWED_TRANSITIONS: Record<string, string[]> = {
       'Placed': ['Confirmed', 'Cancelled'],
-      'Confirmed': ['Shipped', 'Cancelled'],
-      'Shipped': ['Out for Delivery', 'Delivered', 'Cancelled'],
+      'Confirmed': ['Preparation', 'Cancelled'],
+      'Preparation': ['Dispatched', 'Cancelled'],
+      'Dispatched': ['Out for Delivery', 'Delivered', 'Cancelled'],
       'Out for Delivery': ['Delivered', 'Cancelled'],
       'Delivered': [],
       'Cancelled': []
     };
 
     if (!ALLOWED_TRANSITIONS[currentStatus]?.includes(newStatus)) {
-      throw new Error(`Invalid transition from ${currentStatus} to ${newStatus}. Orders must follow the sequence: Placed → Confirmed → Shipped → Delivered.`);
+      throw new Error(`Invalid transition from ${currentStatus} to ${newStatus}. Orders must follow the sequence: Placed → Confirmed → Preparation → Dispatched → Delivered.`);
     }
 
-    // 🔴 Tracking Validation for "Shipped" status
-    if (newStatus === 'Shipped') {
+    // 🔴 Tracking Validation for "Dispatched" status
+    if (newStatus === 'Dispatched') {
       if (!trackingData?.courierName || !trackingData?.trackingId) {
-        throw new Error("Courier name and tracking ID are required to mark as Shipped.");
+        throw new Error("Courier name and tracking ID are required to mark as Dispatched.");
       }
       if (trackingData.trackingId.length < 8) {
         throw new Error("Invalid Tracking ID. Min 8 characters required.");
@@ -322,6 +363,28 @@ export const updateOrderStatusAsync = async (
   }
 };
 
+// ✅ Soft Delete Order
+export const deleteOrderAsync = async (orderId: string) => {
+  try {
+    const docRef = doc(db, "orders", orderId);
+    await updateDoc(docRef, { isDeleted: true, updatedAt: serverTimestamp() });
+  } catch (error) {
+    console.error("Error deleting order:", error);
+    throw error;
+  }
+};
+
+// ✅ Restore Order
+export const restoreOrderAsync = async (orderId: string) => {
+  try {
+    const docRef = doc(db, "orders", orderId);
+    await updateDoc(docRef, { isDeleted: false, updatedAt: serverTimestamp() });
+  } catch (error) {
+    console.error("Error restoring order:", error);
+    throw error;
+  }
+};
+
 // ✅ Find Order by custom Order ID (GS-XXXX)
 export const findOrderAsync = async (orderId: string) => {
   try {
@@ -334,6 +397,20 @@ export const findOrderAsync = async (orderId: string) => {
     return null;
   } catch (error) {
     console.error("Error finding order:", error);
+    throw error;
+  }
+};
+
+// ✅ Empty Bin (Permanent Delete)
+export const emptyBinAsync = async (collectionName: "orders" | "products" | "categories") => {
+  try {
+    const q = query(collection(db, collectionName), where("isDeleted", "==", true));
+    const snap = await getDocs(q);
+    const batch = writeBatch(db);
+    snap.docs.forEach(doc => batch.delete(doc.ref));
+    await batch.commit();
+  } catch (error) {
+    console.error(`Error emptying ${collectionName} bin:`, error);
     throw error;
   }
 };
@@ -354,17 +431,13 @@ export const getStoreSettings = async () => {
     // Default fallback with multi-tier support
     return {
       isFreeGiftEnabled: false,
-      offers: [
-        { id: 'initial-1', threshold: 2000, giftName: "Premium Gift Pack" }
-      ]
+      offers: []
     };
   } catch (error) {
     console.error("Error fetching store settings:", error);
     return {
       isFreeGiftEnabled: false,
-      offers: [
-        { id: 'initial-1', threshold: 2000, giftName: "Premium Gift Pack" }
-      ]
+      offers: []
     };
   }
 };
@@ -452,13 +525,24 @@ export const updateProduct = async (id: string, product: any) => {
   }
 };
 
-// ✅ Delete Product
+// ✅ Delete Product (Soft Delete)
 export const deleteProduct = async (id: string) => {
   try {
     const docRef = doc(db, "products", id);
-    await deleteDoc(docRef);
+    await updateDoc(docRef, { isDeleted: true, updatedAt: serverTimestamp() });
   } catch (error) {
     console.error("Error deleting product:", error);
+    throw error;
+  }
+};
+
+// ✅ Restore Product
+export const restoreProductAsync = async (id: string) => {
+  try {
+    const docRef = doc(db, "products", id);
+    await updateDoc(docRef, { isDeleted: false, updatedAt: serverTimestamp() });
+  } catch (error) {
+    console.error("Error restoring product:", error);
     throw error;
   }
 };

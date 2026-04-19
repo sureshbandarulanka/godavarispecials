@@ -5,35 +5,7 @@ import styles from './HeroBanner.module.css';
 import { subscribeToActiveBanners, Banner } from '@/services/bannerService';
 
 // Fallback banners for when Firebase is unreachable
-const FALLBACK_BANNERS: any[] = [
-  {
-    id: 'fb-1',
-    imageUrl: '/assets/banners/banner01-slide01.png',
-    title: 'Authentic Veg Pickles',
-    subtitle: 'Homemade with Traditional Godavari Recipes',
-    redirectUrl: '/category/Veg%20Pickles',
-    isActive: true,
-    priority: 1
-  },
-  {
-    id: 'fb-2',
-    imageUrl: '/assets/banners/banner01-slide02.png',
-    title: 'Traditional Podis',
-    subtitle: 'Freshly Prepared and Delivered to Your Doorstep',
-    redirectUrl: '/category/Authentic%20Podis',
-    isActive: true,
-    priority: 2
-  },
-  {
-    id: 'fb-3',
-    imageUrl: '/assets/banners/banner02-slide02.png',
-    title: 'Spicy Non-Veg Pickles',
-    subtitle: 'Premium Chicken, Mutton & Fish Pickles',
-    redirectUrl: '/category/Non-Veg%20Pickles',
-    isActive: true,
-    priority: 3
-  }
-];
+const FALLBACK_BANNERS: any[] = [];
 
 export default function HeroBanner({ initialBanners = [] }: { initialBanners?: any[] }) {
   const [activeBanners, setActiveBanners] = useState<any[]>(initialBanners);

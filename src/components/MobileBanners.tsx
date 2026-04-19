@@ -4,12 +4,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { subscribeToActiveBanners, Banner } from '@/services/bannerService';
 
-const FALLBACK_MOBILE_BANNERS = [
-  { id: 'm-fb-1', imageUrl: '/assets/banners/banner01-slide01.png', title: 'Authentic Avakai Pickle', redirectUrl: '/category/Veg%20Pickles' },
-  { id: 'm-fb-2', imageUrl: '/assets/banners/banner01-slide02.png', title: 'Authentic Chicken Pickle', redirectUrl: '/category/Non-Veg%20Pickles' },
-  { id: 'm-fb-3', imageUrl: '/assets/banners/banner02-slide01.png', title: 'Premium Buffalo Ghee', redirectUrl: '/category/Ghee%20%26%20Oils' },
-  { id: 'm-fb-4', imageUrl: '/assets/banners/banner02-slide02.png', title: 'Traditional Podis', redirectUrl: '/category/Authentic%20Podis' },
-];
+const FALLBACK_MOBILE_BANNERS: any[] = [];
 
 export default function MobileBanners({ initialBanners = [] }: { initialBanners?: any[] }) {
   const [banners, setBanners] = useState<(Banner | any)[]>(initialBanners);

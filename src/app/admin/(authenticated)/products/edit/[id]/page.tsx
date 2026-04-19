@@ -5,6 +5,21 @@ import { useRouter } from 'next/navigation';
 import { updateProduct, getProductByIdAsync, fetchFirebaseData, uploadProductImage } from '@/services/productService';
 import { useCategories } from '@/context/CategoryContext';
 import Link from 'next/link';
+import { 
+  DndContext, 
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import SortableImageItem from '@/components/admin/SortableImageItem';
 
 interface Variant {
   weight: string;
@@ -26,6 +41,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     category: '',
     description: '',
     type: 'veg' as 'veg' | 'non-veg' | 'sweet' | 'pindi-vantalu' | 'hot-snacks' | 'ghee' | 'oil',
+    isOutOfStock: false,
   });
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -33,6 +49,60 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const [variants, setVariants] = useState<Variant[]>([]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const combinedImages: { id: string; url: string; isExisting: boolean; file?: File }[] = [
+    ...existingImages.map(url => ({ id: url, url, isExisting: true })),
+    ...previewUrls.map((url, idx) => ({ id: url, url, isExisting: false, file: selectedFiles[idx] }))
+  ];
+
+  const handleDragEnd = (event: any) => {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      const oldIndex = combinedImages.findIndex(img => img.id === active.id);
+      const newIndex = combinedImages.findIndex(img => img.id === over.id);
+      
+      const newCombined = arrayMove(combinedImages, oldIndex, newIndex);
+      
+      const newExisting: string[] = [];
+      const newPreviews: string[] = [];
+      const newFiles: File[] = [];
+      
+      newCombined.forEach(img => {
+        if (img.isExisting) {
+          newExisting.push(img.url);
+        } else {
+          newPreviews.push(img.url);
+          if (img.file) newFiles.push(img.file);
+        }
+      });
+      
+      setExistingImages(newExisting);
+      setPreviewUrls(newPreviews);
+      setSelectedFiles(newFiles);
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const item = combinedImages[index];
+    if (item.isExisting) {
+      setExistingImages(prev => prev.filter(url => url !== item.url));
+    } else {
+      const newIndex = previewUrls.indexOf(item.url);
+      setSelectedFiles(prev => prev.filter((_, i) => i !== newIndex));
+      setPreviewUrls(prev => {
+        URL.revokeObjectURL(prev[newIndex]);
+        return prev.filter((_, i) => i !== newIndex);
+      });
+    }
+  };
 
   useEffect(() => {
     const loadProductData = async () => {
@@ -47,6 +117,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             category: product.category || '',
             description: product.description || '',
             type: product.type || 'veg',
+            isOutOfStock: product.isOutOfStock || false,
           });
           
           // Load images array if exists, otherwise fallback to single image
@@ -93,18 +164,6 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
 
     setSelectedFiles(prev => [...prev, ...newFiles]);
     setPreviewUrls(prev => [...prev, ...newPreviews]);
-  };
-
-  const removeExistingImage = (index: number) => {
-    setExistingImages(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const removeNewFile = (index: number) => {
-    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
-    setPreviewUrls(prev => {
-      URL.revokeObjectURL(prev[index]);
-      return prev.filter((_, i) => i !== index);
-    });
   };
 
   const handleVariantChange = (index: number, field: keyof Variant, value: string | number) => {
@@ -230,15 +289,43 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   value={formData.type}
                   onChange={handleInputChange}
                 >
-                  <option value="veg">Veg</option>
-                  <option value="non-veg">Non-Veg</option>
-                  <option value="sweet">Sweet</option>
-                  <option value="pindi-vantalu">Pindi Vantalu</option>
-                  <option value="hot-snacks">Hot Snacks</option>
-                  <option value="ghee">Ghee</option>
-                  <option value="oil">Oil</option>
+                  <option value="">Select Type</option>
+                  {/* Show category specific types if available */}
+                  {categories.find(c => c.name === formData.category)?.types?.map(t => (
+                    <option key={t} value={t}>{t}</option>
+                  )) || (
+                    <>
+                      <option value="veg">Veg</option>
+                      <option value="non-veg">Non-Veg</option>
+                      <option value="sweet">Sweet</option>
+                      <option value="pindi-vantalu">Pindi Vantalu</option>
+                      <option value="hot-snacks">Hot Snacks</option>
+                      <option value="ghee">Ghee</option>
+                      <option value="oil">Oil</option>
+                    </>
+                  )}
                 </select>
               </div>
+              <div className="form-group">
+                <label className="form-label">Availability</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', height: '44px' }}>
+                  <label className="switch">
+                    <input 
+                      type="checkbox" 
+                      name="isOutOfStock"
+                      checked={formData.isOutOfStock}
+                      onChange={(e) => setFormData({ ...formData, isOutOfStock: e.target.checked })}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: formData.isOutOfStock ? '#ef4444' : '#10b981' }}>
+                    {formData.isOutOfStock ? 'Out of Stock' : 'In Stock'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Product Images (Multiple)</label>
                 <div className="multi-upload-container">
@@ -252,35 +339,27 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                   </div>
 
                   <div className="upload-previews-grid">
-                    {/* Existing Images */}
-                    {existingImages.map((url, idx) => (
-                      <div key={`existing-${idx}`} className="preview-item">
-                        <img src={url} alt={`Existing ${idx + 1}`} />
-                        <button 
-                          type="button" 
-                          className="remove-preview" 
-                          onClick={() => removeExistingImage(idx)}
-                        >
-                          ×
-                        </button>
-                        {idx === 0 && <span className="primary-badge">Main</span>}
-                      </div>
-                    ))}
-
-                    {/* New Previews */}
-                    {previewUrls.map((url, idx) => (
-                      <div key={`new-${idx}`} className="preview-item">
-                        <img src={url} alt={`New Preview ${idx + 1}`} />
-                        <button 
-                          type="button" 
-                          className="remove-preview" 
-                          onClick={() => removeNewFile(idx)}
-                        >
-                          ×
-                        </button>
-                        {existingImages.length === 0 && idx === 0 && <span className="primary-badge">Main</span>}
-                      </div>
-                    ))}
+                    <DndContext 
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext 
+                        items={combinedImages.map(img => img.id)}
+                        strategy={rectSortingStrategy}
+                      >
+                        {combinedImages.map((img, idx) => (
+                          <SortableImageItem 
+                            key={img.id} 
+                            id={img.id} 
+                            url={img.url} 
+                            index={idx} 
+                            onRemove={handleRemoveImage}
+                            isMain={idx === 0}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DndContext>
                   </div>
 
                   {uploading && (
