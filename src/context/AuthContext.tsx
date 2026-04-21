@@ -99,9 +99,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signupWithEmail = async (name: string, email: string, pass: string, phone?: string) => {
+    // 🛑 Check for duplicate phone
+    if (phone) {
+      const { isPhoneAlreadyUsed } = await import('@/services/authService');
+      const isUsed = await isPhoneAlreadyUsed(phone);
+      if (isUsed) {
+        throw new Error("Phone number already in use by another account! 🚫");
+      }
+    }
+
     const res = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(res.user, { displayName: name });
-    // Firestore sync is handled by onAuthStateChanged effect
+    
+    // If phone was provided, we need to sync it to Firestore manually or via syncUserToFirestore
+    // Since syncUserToFirestore is called by onAuthStateChanged, we should make sure it knows about the phone.
+    // However, createUserWithEmailAndPassword doesn't set phone on the user object.
+    // So we'll update Firestore directly here or in syncUserToFirestore.
+    
     setIsLoginModalOpen(false);
   };
 

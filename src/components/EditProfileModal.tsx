@@ -68,6 +68,22 @@ export default function EditProfileModal({
 
             <div className={styles.inputGroup}>
               <label className={styles.label}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                Email Address
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                className={styles.input}
+                readOnly
+                style={{ backgroundColor: '#f8fafc', cursor: 'not-allowed', color: '#64748b' }}
+              />
+              <p style={{ fontSize: '10px', color: '#94a3b8', marginTop: '4px', marginLeft: '24px' }}>Linked to your Google account</p>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.label}>
                 <Phone size={16} />
                 Phone Number
               </label>

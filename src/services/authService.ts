@@ -8,7 +8,7 @@ import {
   onAuthStateChanged,
   User as FirebaseUser
 } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp, collection, getDocs, query, where } from "firebase/firestore";
 
 export interface UserData {
   uid: string;
@@ -98,4 +98,38 @@ export const logout = async () => {
 export const getUsersAsync = async () => {
   const querySnapshot = await getDocs(collection(db, "users"));
   return querySnapshot.docs.map(doc => doc.data() as UserData);
+};
+
+/**
+ * Check if a phone number is already in use by another account
+ */
+export const isPhoneAlreadyUsed = async (phone: string, excludeUid?: string) => {
+  if (!phone) return false;
+  const q = query(collection(db, "users"), where("phone", "==", phone));
+  const querySnapshot = await getDocs(q);
+  
+  if (querySnapshot.empty) return false;
+  
+  if (excludeUid) {
+    return querySnapshot.docs.some(doc => doc.id !== excludeUid);
+  }
+  
+  return true;
+};
+
+/**
+ * Check if an email is already in use by another account
+ */
+export const isEmailAlreadyUsed = async (email: string, excludeUid?: string) => {
+  if (!email) return false;
+  const q = query(collection(db, "users"), where("email", "==", email));
+  const querySnapshot = await getDocs(q);
+  
+  if (querySnapshot.empty) return false;
+  
+  if (excludeUid) {
+    return querySnapshot.docs.some(doc => doc.id !== excludeUid);
+  }
+  
+  return true;
 };

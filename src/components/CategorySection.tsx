@@ -27,7 +27,7 @@ export default function CategorySection({ title, slug, products, isAlternate }: 
     }
   };
 
-  const displayProducts = products.slice(0, 8);
+  const displayProducts = products;
 
   return (
     <section className={`${styles.section} ${isAlternate ? styles.alternateBg : ''}`}>

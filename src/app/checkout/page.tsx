@@ -92,7 +92,12 @@ export default function CheckoutPage() {
       setGiftSettings(gSettings);
 
       if (user) {
-        setFormData(prev => ({ ...prev, name: user.name || '', phone: user.phone || '' }));
+        setFormData(prev => ({ 
+          ...prev, 
+          name: user.name || '', 
+          phone: user.phone || '',
+          email: user.email || '' 
+        }));
       }
     };
 
@@ -516,8 +521,9 @@ export default function CheckoutPage() {
                       <input type="tel" value={formData.phone} onChange={e => setFormData({...formData, phone: e.target.value})} required placeholder="10-digit mobile" maxLength={10} />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Email (Optional)</label>
-                      <input type="email" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="email@example.com" />
+                      <label>Email Address</label>
+                      <input type="email" value={formData.email} readOnly style={{ backgroundColor: '#f8fafc', cursor: 'not-allowed', color: '#64748b' }} placeholder="email@example.com" />
+                      <p style={{ fontSize: '10px', color: '#94a3b8', marginTop: '4px' }}>Linked to your login account</p>
                     </div>
                     <div className={styles.formGroup}>
                       <label>Pincode *</label>

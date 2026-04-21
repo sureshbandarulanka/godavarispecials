@@ -86,7 +86,7 @@ export default function ProfilePage() {
                   <div>
                     <p className={styles.name}>{user.name}</p>
                     <p className={styles.email}>{user.email}</p>
-                    <p className={styles.mobile}>+91 9618070847</p>
+                    <p className={styles.mobile}>{user.phone || 'No phone set'}</p>
                   </div>
                 </div>
               </div>
@@ -165,8 +165,8 @@ export default function ProfilePage() {
             </div>
             <h2 className="profile-name-large">{user.name}</h2>
             <div className="profile-meta-row">
-              <span className="profile-phone-large">📞 9618070847</span>
-              <span className="profile-dob-large">🎂 07 Dec 1994</span>
+              <span className="profile-phone-large">📞 {user.phone || 'No phone set'}</span>
+              {user.dob && <span className="profile-dob-large">🎂 {user.dob}</span>}
             </div>
           </div>
         </div>

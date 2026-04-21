@@ -76,6 +76,18 @@ export default function MyProfilePage() {
     try {
       const { doc, updateDoc } = await import('firebase/firestore');
       const { db } = await import('@/lib/firebase');
+      const { isPhoneAlreadyUsed } = await import('@/services/authService');
+
+      // 🛑 Check for duplicate phone
+      if (formData.phone && formData.phone !== user.phone) {
+        const isUsed = await isPhoneAlreadyUsed(formData.phone, user.uid);
+        if (isUsed) {
+          showToast("Phone number already in use by another account! 🚫");
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       const userRef = doc(db, 'users', user.uid);
       
       await updateDoc(userRef, {
@@ -141,12 +153,12 @@ export default function MyProfilePage() {
                       type="email" 
                       name="email" 
                       value={formData.email} 
-                      onChange={handleChange} 
-                      contentEditable={false} // Email typically uneditable if from OAuth
+                      readOnly
                       placeholder="Enter your email" 
                       className={styles.input}
-                      disabled
+                      style={{ backgroundColor: '#f8fafc', cursor: 'not-allowed', color: '#64748b' }}
                     />
+                    <p style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>This email is linked to your login account and cannot be changed.</p>
                   </div>
                   <div className={styles.formGroup}>
                     <label>Phone Number</label>
