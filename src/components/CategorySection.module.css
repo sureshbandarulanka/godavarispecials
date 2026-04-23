@@ -116,7 +116,7 @@
   }
 
   .carouselItem {
-    flex: 0 0 calc(50% - 4px); /* Show exactly 2 cards with minimal peek */
+    flex: 0 0 42%; /* Show 2 full cards and a peek of the 3rd card */
     display: flex;
     flex-direction: column;
     height: auto;
@@ -150,7 +150,7 @@
 
 @media (min-width: 1024px) {
   .carouselItem {
-    flex: 0 0 calc(16.66% - 14px); /* 6 cards precisely */
-    max-width: 210px;
+    flex: 0 0 calc(16.666% - 14px); /* 6 cards per row */
+    max-width: 200px;
   }
 }

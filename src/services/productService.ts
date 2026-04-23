@@ -47,7 +47,14 @@ export const subscribeToProducts = (
       // 🔥 Filter by Schedule and Sort
       const activeProducts = products
         .filter(isActiveBySchedule)
-        .sort((a: any, b: any) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        .sort((a: any, b: any) => {
+          if (a.priority !== undefined && b.priority !== undefined) {
+            return a.priority - b.priority;
+          }
+          if (a.priority !== undefined) return -1;
+          if (b.priority !== undefined) return 1;
+          return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+        });
 
       // Keep module-level cache in sync too
       firebaseProducts = activeProducts;
@@ -96,6 +103,21 @@ export const updateCategoryOrder = async (orderedIds: string[]) => {
     await batch.commit();
   } catch (error) {
     console.error("Error updating category order:", error);
+    throw error;
+  }
+};
+
+// ✅ Update Product Order
+export const updateProductsOrder = async (orderedIds: string[]) => {
+  try {
+    const batch = writeBatch(db);
+    orderedIds.forEach((id, index) => {
+      const docRef = doc(db, "products", id);
+      batch.update(docRef, { priority: index });
+    });
+    await batch.commit();
+  } catch (error) {
+    console.error("Error updating product order:", error);
     throw error;
   }
 };
@@ -493,12 +515,30 @@ export const getProductById = (id: string | number): Product | undefined => {
 
 // ✅ Get Products by Category
 export const getProductsByCategory = (category: string) => {
-  return getProducts().filter(p => p.category === category);
+  return getProducts()
+    .filter(p => p.category === category)
+    .sort((a: any, b: any) => {
+      if (a.priority !== undefined && b.priority !== undefined) {
+        return a.priority - b.priority;
+      }
+      if (a.priority !== undefined) return -1;
+      if (b.priority !== undefined) return 1;
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+    });
 };
 
 // ✅ Get Products by Category Slug
 export const getProductsByCategorySlug = (slug: string) => {
-  return getProducts().filter(p => (p as any).categorySlug === slug);
+  return getProducts()
+    .filter(p => (p as any).categorySlug === slug)
+    .sort((a: any, b: any) => {
+      if (a.priority !== undefined && b.priority !== undefined) {
+        return a.priority - b.priority;
+      }
+      if (a.priority !== undefined) return -1;
+      if (b.priority !== undefined) return 1;
+      return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+    });
 };
 
 // 🔥 CRUD OPERATIONS

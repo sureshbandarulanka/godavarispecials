@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       router.push('/admin/dashboard');
     } catch (err: any) {
       console.error("Login detail error:", err);
