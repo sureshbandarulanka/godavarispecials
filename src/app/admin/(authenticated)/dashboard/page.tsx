@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { getOrdersAsync, getProducts, fetchFirebaseData } from '@/services/productService';
 import { getUsersAsync } from '@/services/authService';
+import { getTodayVisits, getTodayVisitDetails } from '@/services/analyticsService';
 import { useCategories } from '@/context/CategoryContext';
 import { 
   TrendingUp, 
@@ -11,7 +12,8 @@ import {
   Clock, 
   Package,
   IndianRupee,
-  ChevronRight
+  ChevronRight,
+  Eye
 } from 'lucide-react';
 import { 
   XAxis, 
@@ -42,8 +44,10 @@ export default function DashboardPage() {
   const [allUsers, setAllUsers] = useState<any[]>([]);
   const [allProducts, setAllProducts] = useState<any[]>([]);
   const [userStats, setUserStats] = useState({ total: 0, today: 0 });
+  const [todayVisitsCount, setTodayVisitsCount] = useState(0);
+  const [visitDetails, setVisitDetails] = useState<any[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'users' | 'today-users' | 'orders' | 'today-orders' | 'products' | 'categories' | null>(null);
+  const [modalType, setModalType] = useState<'users' | 'today-users' | 'today-visits' | 'orders' | 'today-orders' | 'products' | 'categories' | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -56,6 +60,12 @@ export default function DashboardPage() {
         
         const data = await getOrdersAsync();
         setOrders(data as Order[]);
+
+        const visits = await getTodayVisits();
+        setTodayVisitsCount(visits);
+
+        const vDetails = await getTodayVisitDetails();
+        setVisitDetails(vDetails);
 
         const users = await getUsersAsync();
         setAllUsers(users);
@@ -250,6 +260,19 @@ export default function DashboardPage() {
             <Users size={24} />
           </div>
         </div>
+
+        <div className="admin-stat-card clickable" onClick={() => { setModalType('today-visits'); setIsModalOpen(true); }}>
+          <div className="admin-stat-info">
+            <h3>Today's Website Visitors</h3>
+            <div className="admin-stat-value">{loading ? '...' : todayVisitsCount}</div>
+            <div style={{ fontSize: '12px', color: '#3b82f6', marginTop: '4px' }}>
+              Click to view who visited
+            </div>
+          </div>
+          <div className="admin-stat-icon icon-blue">
+            <Eye size={24} />
+          </div>
+        </div>
       </div>
 
       <div className="admin-card-header" style={{ marginBottom: '16px' }}>
@@ -425,6 +448,7 @@ export default function DashboardPage() {
               <h2>{
                 modalType === 'users' ? 'All Registered Users' : 
                 modalType === 'today-users' ? 'Today\'s New Users' :
+                modalType === 'today-visits' ? 'Today\'s Website Visitors' :
                 modalType === 'orders' ? 'All Orders' : 
                 modalType === 'today-orders' ? 'Today\'s Orders' :
                 modalType === 'products' ? 'Product Inventory' :
@@ -433,7 +457,51 @@ export default function DashboardPage() {
               <button className="close-btn" onClick={() => setIsModalOpen(false)}>&times;</button>
             </div>
             <div className="modal-body">
-              {modalType?.includes('users') ? (
+              {modalType === 'today-visits' ? (
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Visitor Type</th>
+                      <th>Name / Email</th>
+                      <th>Device & Browser</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visitDetails.length > 0 ? visitDetails.map((v, i) => {
+                      const date = v.timestamp?.toDate ? v.timestamp.toDate() : new Date(v.timestamp);
+                      return (
+                        <tr key={i}>
+                          <td>{date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</td>
+                          <td>
+                            <span className={`badge ${v.type === 'User' ? 'badge-success' : 'badge-info'}`}>
+                              {v.type}
+                            </span>
+                          </td>
+                          <td>
+                            {v.type === 'User' ? (
+                              <div>
+                                <div style={{ fontWeight: 600 }}>{v.name || 'User'}</div>
+                                <div style={{ fontSize: '12px', color: '#64748b' }}>{v.email || v.phone || '-'}</div>
+                              </div>
+                            ) : (
+                              <div style={{ color: '#64748b' }}>Anonymous Visitor</div>
+                            )}
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: 600 }}>{v.device || 'Desktop'}</div>
+                            <div style={{ fontSize: '12px', color: '#64748b', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={v.userAgent}>
+                              {v.userAgent}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    }) : (
+                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px 0', color: '#64748b' }}>No detailed visits recorded today yet.</td></tr>
+                    )}
+                  </tbody>
+                </table>
+              ) : modalType?.includes('users') ? (
                 <table className="admin-table">
                   <thead>
                     <tr>

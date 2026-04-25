@@ -16,6 +16,7 @@ import MobileUILayer from "@/components/MobileUILayer";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { getCategoriesAsync } from "@/services/productService";
 import { getActiveBanners } from "@/services/bannerService";
+import VisitorTracker from "@/components/VisitorTracker";
 
 // Load Inter with font-display: swap to avoid FOIT (Flash of Invisible Text)
 const inter = Inter({
@@ -111,6 +112,7 @@ export default async function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <AuthProvider>
+          <VisitorTracker />
           <LocationProvider>
             <CartProvider>
               <ProductProvider>
