@@ -646,7 +646,7 @@
 
 .variant-item {
   display: grid;
-  grid-template-columns: 1fr 1fr 40px;
+  grid-template-columns: 36px 1fr 1fr 32px;
   gap: 12px;
   align-items: center;
 }
