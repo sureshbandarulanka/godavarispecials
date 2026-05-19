@@ -221,7 +221,7 @@ export default function AdminProductsPage() {
                 ))}
               </select>
             </div>
-            {activeTab === 'active' && selectedCategory !== 'All' && (
+            {activeTab === 'active' && (
               <div style={{ fontSize: '12px', color: '#3b82f6', fontWeight: 600, background: '#eff6ff', padding: '4px 10px', borderRadius: '20px' }}>
                 Drag products to reorder
               </div>
@@ -298,7 +298,6 @@ export default function AdminProductsPage() {
                         setDeleteId={setDeleteId}
                         handleRestore={handleRestore}
                         activeTab={activeTab}
-                        selectedCategory={selectedCategory}
                       />
                     ))}
                   </SortableContext>
@@ -486,8 +485,7 @@ const SortableProductRow = ({
   toggleSelect,
   setDeleteId,
   handleRestore,
-  activeTab,
-  selectedCategory
+  activeTab
 }: any) => {
   const {
     attributes,
@@ -529,14 +527,15 @@ const SortableProductRow = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {activeTab === 'active' && (
             <div
-              {...(selectedCategory !== 'All' ? { ...attributes, ...listeners } : {})}
+              {...attributes}
+              {...listeners}
               className="drag-handle"
               style={{
-                cursor: selectedCategory !== 'All' ? 'grab' : 'not-allowed',
-                color: selectedCategory !== 'All' ? '#3b82f6' : '#cbd5e1',
-                opacity: selectedCategory !== 'All' ? 1 : 0.4
+                cursor: 'grab',
+                color: '#3b82f6',
+                opacity: 1
               }}
-              title={selectedCategory !== 'All' ? "Drag to reorder" : "Select a category to enable reordering"}
+              title="Drag to reorder"
             >
               <GripVertical size={18} />
             </div>

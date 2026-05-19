@@ -18,10 +18,17 @@ export const fetchFirebaseData = async () => {
       ...doc.data()
     })) as Product[];
 
-    // 🔥 Filter by Schedule and Sort by CreatedAt (Latest First)
+    // 🔥 Filter by Schedule and Sort
     firebaseProducts = products
       .filter(isActiveBySchedule)
-      .sort((a: any, b: any) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      .sort((a: any, b: any) => {
+        if (a.priority !== undefined && b.priority !== undefined) {
+          return a.priority - b.priority;
+        }
+        if (a.priority !== undefined) return -1;
+        if (b.priority !== undefined) return 1;
+        return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+      });
 
     console.log("✅ Firebase products loaded");
   } catch (error) {
