@@ -7,7 +7,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import { useCart } from '@/context/CartContext';
-import { getProductById, getProductsByCategory, getProducts, fetchFirebaseData } from '@/services/productService';
+import { useProducts } from '@/context/ProductContext';
 import { getDisplayPrice, getBasePrice } from '@/utils/pricingEngine';
 import { useLocation } from '@/context/LocationContext';
 import { useOffers } from '@/context/OfferContext';
@@ -85,6 +85,7 @@ export default function ProductClient({
   const router = useRouter();
   const { cartItems, addToCart, removeFromCart, updateQuantity } = useCart();
   const { location, shippingRule } = useLocation();
+  const { products, loading: productsLoading } = useProducts();
   const { getOfferForProduct } = useOffers();
   const { user, openLoginModal } = useAuth();
   
@@ -127,30 +128,41 @@ export default function ProductClient({
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [id]);
 
-    const loadProductData = async () => {
-      await fetchFirebaseData();
-      const foundProduct = getProductById(id);
+  useEffect(() => {
+    if (productsLoading) return;
+    
+    if (products.length > 0) {
+      const foundProduct = products.find(p => p.id.toString() === id.toString());
       if (foundProduct) {
         setProduct(foundProduct);
-        if (!mainImage) setMainImage(foundProduct.image || 'https://placehold.co/400x400?text=No+Image');
-        if (!selectedVariant) {
-          const default500g = foundProduct.variants.find((v: any) => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
-          setSelectedVariant(default500g || foundProduct.variants[0]);
-        }
         
-        const similar = getProductsByCategory(foundProduct.category).filter(p => p.id.toString() !== id.toString());
+        setMainImage(prev => prev || foundProduct.image || 'https://placehold.co/400x400?text=No+Image');
+        
+        setSelectedVariant((prev: any) => {
+          if (!prev) {
+            const default500g = foundProduct.variants.find((v: any) => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
+            return default500g || foundProduct.variants[0];
+          }
+          const updatedVariant = foundProduct.variants.find((v: any) => v.weight === prev.weight);
+          return updatedVariant || prev;
+        });
+        
+        const similar = products.filter(p => p.category === foundProduct.category && p.id.toString() !== id.toString());
         setSimilarProducts(similar.slice(0, 5));
         
-        const others = getProducts().filter(p => p.category !== foundProduct.category).slice(0, 5);
+        const others = products.filter(p => p.category !== foundProduct.category).slice(0, 5);
         setPeopleAlsoBought(others);
+        
         setIsNotFound(false);
       } else {
         setIsNotFound(true);
       }
-    };
-    loadProductData();
-  }, [id]);
+    } else if (!initialProduct) {
+      setIsNotFound(true);
+    }
+  }, [products, id, productsLoading, initialProduct]);
 
   if (isNotFound) {
     return (
