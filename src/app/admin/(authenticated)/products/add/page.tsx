@@ -18,10 +18,13 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   rectSortingStrategy,
+  verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableImageItem from '@/components/admin/SortableImageItem';
+import SortableVariantItem from '@/components/admin/SortableVariantItem';
 
 interface Variant {
+  id: string;
   weight: string;
   price: number;
 }
@@ -46,7 +49,7 @@ export default function AddProductPage() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   const [variants, setVariants] = useState<Variant[]>([
-    { weight: '250g', price: 0 }
+    { id: Math.random().toString(36).substr(2, 9), weight: '250g', price: 0 }
   ]);
 
   const sensors = useSensors(
@@ -65,6 +68,17 @@ export default function AddProductPage() {
 
       setPreviewUrls((items) => arrayMove(items, oldIndex, newIndex));
       setSelectedFiles((items) => arrayMove(items, oldIndex, newIndex));
+    }
+  };
+
+  const handleVariantDragEnd = (event: any) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setVariants((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
     }
   };
 
@@ -107,18 +121,16 @@ export default function AddProductPage() {
     });
   };
 
-  const handleVariantChange = (index: number, field: keyof Variant, value: string | number) => {
-    const updatedVariants = [...variants];
-    updatedVariants[index] = { ...updatedVariants[index], [field]: value };
-    setVariants(updatedVariants);
+  const handleVariantChange = (id: string, field: keyof Variant, value: string | number) => {
+    setVariants(variants.map(v => v.id === id ? { ...v, [field]: value } : v));
   };
 
   const addVariant = () => {
-    setVariants([...variants, { weight: '', price: 0 }]);
+    setVariants([...variants, { id: Math.random().toString(36).substr(2, 9), weight: '', price: 0 }]);
   };
 
-  const removeVariant = (index: number) => {
-    setVariants(variants.filter((_, i) => i !== index));
+  const removeVariant = (id: string) => {
+    setVariants(variants.filter((v) => v.id !== id));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,7 +149,7 @@ export default function AddProductPage() {
       const productData = {
         ...formData,
         categorySlug: selectedCat?.slug || '',
-        variants,
+        variants: variants.map(({ id, ...rest }) => rest),
         image: '', // Primary image (first one)
         images: [], // All images
         createdAt: new Date().toISOString()
@@ -328,34 +340,27 @@ export default function AddProductPage() {
             <div className="form-group">
               <label className="form-label">Variants (Weights & Prices)</label>
               <div className="variants-list">
-                {variants.map((v, index) => (
-                  <div key={index} className="variant-item">
-                    <input 
-                      type="text" 
-                      placeholder="Weight (e.g. 500g)" 
-                      className="form-input" 
-                      value={v.weight}
-                      onChange={(e) => handleVariantChange(index, 'weight', e.target.value)}
-                      required
-                    />
-                    <input 
-                      type="number" 
-                      placeholder="Price (₹)" 
-                      className="form-input" 
-                      value={v.price === 0 ? '' : v.price}
-                      onChange={(e) => handleVariantChange(index, 'price', Number(e.target.value))}
-                      required
-                    />
-                    <button 
-                      type="button" 
-                      className="btn-icon delete" 
-                      onClick={() => removeVariant(index)}
-                      disabled={variants.length === 1}
-                    >
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                  </div>
-                ))}
+                <DndContext 
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleVariantDragEnd}
+                >
+                  <SortableContext 
+                    items={variants.map(v => v.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {variants.map((v, index) => (
+                      <SortableVariantItem
+                        key={v.id}
+                        variant={v}
+                        index={index}
+                        onVariantChange={handleVariantChange}
+                        onRemove={removeVariant}
+                        disableRemove={variants.length === 1}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
                 <button type="button" className="btn-secondary" style={{ alignSelf: 'flex-start', borderStyle: 'dashed' }} onClick={addVariant}>
                   + Add Variant
                 </button>

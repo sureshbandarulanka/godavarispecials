@@ -34,6 +34,7 @@ export default function AdminOrdersPage() {
   const [trackingId, setTrackingId] = useState("");
   const [toast, setToast] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'active' | 'deleted'>('active');
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   const handleDownload = async (type: 'INVOICE' | 'BILL') => {
     if (!selectedOrder) return;
@@ -82,6 +83,15 @@ export default function AdminOrdersPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ orderId }),
         }).catch(err => console.error("Failed to send delivery email:", err));
+      }
+
+      // TRIGGER DISPATCH EMAIL on Dispatched
+      if (newStatus === 'Dispatched') {
+        fetch('/api/send-dispatch', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId, courierName, trackingId }),
+        }).catch(err => console.error("Failed to send dispatch email:", err));
       }
 
       setToast(`Order updated to ${newStatus}`);
@@ -365,7 +375,10 @@ export default function AdminOrdersPage() {
                   </button>
                 )}
                 <button 
-                  onClick={() => setSelectedOrder(null)}
+                  onClick={() => {
+                    setSelectedOrder(null);
+                    setPendingStatus(null);
+                  }}
                   style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#64748b' }}
                 >
                   &times;
@@ -392,8 +405,16 @@ export default function AdminOrdersPage() {
                     <select 
                       className="form-select" 
                       style={{ fontSize: '13px', padding: '6px 10px', minWidth: '150px' }}
-                      value={selectedOrder.status}
-                      onChange={(e) => handleStatusUpdate(selectedOrder.id, e.target.value)}
+                      value={pendingStatus || selectedOrder.status}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === 'Dispatched') {
+                          setPendingStatus(val);
+                        } else {
+                          setPendingStatus(null);
+                          handleStatusUpdate(selectedOrder.id, val);
+                        }
+                      }}
                       disabled={updatingStatus || getAllowedStatuses(selectedOrder.status).length === 0}
                     >
                       <option value={selectedOrder.status} disabled>{selectedOrder.status}</option>
@@ -403,7 +424,7 @@ export default function AdminOrdersPage() {
                     </select>
                   </div>
 
-                  {getAllowedStatuses(selectedOrder.status).includes('Dispatched') && (
+                  {pendingStatus === 'Dispatched' && (
                     <div style={{ 
                       width: '100%', 
                       maxWidth: '300px', 
@@ -433,6 +454,17 @@ export default function AdminOrdersPage() {
                         onChange={(e) => setTrackingId(e.target.value)}
                       />
                       <div style={{ fontSize: '10px', color: '#94a3b8' }}>Tracking ID must be min 8 chars.</div>
+                      <button 
+                        className="btn-primary" 
+                        style={{ marginTop: '8px', padding: '8px', fontSize: '12px' }}
+                        onClick={() => {
+                          handleStatusUpdate(selectedOrder.id, 'Dispatched');
+                          setPendingStatus(null);
+                        }}
+                        disabled={updatingStatus}
+                      >
+                        {updatingStatus ? 'Updating...' : 'Confirm Dispatch & Send Email'}
+                      </button>
                     </div>
                   )}
                 </div>
@@ -510,7 +542,7 @@ export default function AdminOrdersPage() {
             </div>
 
             <div style={{ padding: '16px 24px', background: '#f8fafc', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn-secondary" onClick={() => setSelectedOrder(null)}>Close Details</button>
+              <button className="btn-secondary" onClick={() => { setSelectedOrder(null); setPendingStatus(null); }}>Close Details</button>
             </div>
           </div>
         </div>

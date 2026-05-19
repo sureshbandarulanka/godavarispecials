@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import path from 'path';
 import fs from 'fs';
 import { generateOrderPDF } from '@/utils/pdfGenerator';
-import { getOrderByIdAsync } from '@/services/productService';
+import admin from '@/lib/firebaseAdmin';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,11 +13,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Order ID missing" }, { status: 400 });
     }
 
-    // 1. Fetch Fresh Data from Firestore (Authority Check)
-    const order = await getOrderByIdAsync(firebaseId);
-    if (!order) {
+    // 1. Fetch Fresh Data from Firestore (Authority Check using Admin SDK)
+    const orderSnap = await admin.firestore().collection('orders').doc(firebaseId).get();
+    if (!orderSnap.exists) {
       return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
     }
+    const order = { id: orderSnap.id, ...orderSnap.data() };
 
     const { orderId, items, address, total, paymentMethod } = order as any;
 
