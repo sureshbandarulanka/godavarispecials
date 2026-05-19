@@ -85,11 +85,13 @@ export default function ProductCard({ product }: { product: Product }) {
     }
   };
   
-  const [selectedVariant, setSelectedVariant] = React.useState(
-    product.variants && product.variants.length > 0 
-      ? product.variants[0] 
-      : { weight: 'Default', price: 0 } as any
-  );
+  const [selectedVariant, setSelectedVariant] = React.useState(() => {
+    if (product.variants && product.variants.length > 0) {
+      const default500g = product.variants.find(v => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
+      return default500g || product.variants[0];
+    }
+    return { weight: 'Default', price: 0 } as any;
+  });
   
   const cartItem = cartItems.find(item => item.product.id === product.id && item.weight === selectedVariant.weight);
   const quantity = cartItem ? cartItem.quantity : 0;

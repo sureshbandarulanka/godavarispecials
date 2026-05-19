@@ -103,7 +103,13 @@ export default function ProductClient({
   const [isNotified, setIsNotified] = useState(false);
   const [isNotifyLoading, setIsNotifyLoading] = useState(false);
   
-  const [selectedVariant, setSelectedVariant] = useState<any>(initialProduct?.variants?.[0] || null);
+  const [selectedVariant, setSelectedVariant] = useState<any>(() => {
+    if (initialProduct?.variants && initialProduct.variants.length > 0) {
+      const default500g = initialProduct.variants.find((v: any) => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
+      return default500g || initialProduct.variants[0];
+    }
+    return null;
+  });
 
   const currentPrice = useMemo(() => {
     return getDisplayPrice(selectedVariant, activeOffer);
@@ -128,7 +134,10 @@ export default function ProductClient({
       if (foundProduct) {
         setProduct(foundProduct);
         if (!mainImage) setMainImage(foundProduct.image || 'https://placehold.co/400x400?text=No+Image');
-        if (!selectedVariant) setSelectedVariant(foundProduct.variants[0]);
+        if (!selectedVariant) {
+          const default500g = foundProduct.variants.find((v: any) => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
+          setSelectedVariant(default500g || foundProduct.variants[0]);
+        }
         
         const similar = getProductsByCategory(foundProduct.category).filter(p => p.id.toString() !== id.toString());
         setSimilarProducts(similar.slice(0, 5));
