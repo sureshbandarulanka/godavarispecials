@@ -90,12 +90,9 @@ export default function HomeContent({
         
         return (
           <React.Fragment key={category.id || category.slug}>
-            <CategorySection 
-              title="Traditional Veg Pickles" 
-              slug={category.slug}
-              products={vegPickles} 
-              isAlternate={index % 2 !== 0} 
-            />
+            {topSellingProducts.length > 0 && (
+              <TopSellingSection products={topSellingProducts} />
+            )}
             {nonVegPickles.length > 0 && (
               <CategorySection 
                 title="Non-Veg Pickles" 
@@ -104,9 +101,12 @@ export default function HomeContent({
                 isAlternate={index % 2 === 0} 
               />
             )}
-            {topSellingProducts.length > 0 && (
-              <TopSellingSection products={topSellingProducts} />
-            )}
+            <CategorySection 
+              title="Traditional Veg Pickles" 
+              slug={category.slug}
+              products={vegPickles} 
+              isAlternate={index % 2 !== 0} 
+            />
           </React.Fragment>
         );
       }
