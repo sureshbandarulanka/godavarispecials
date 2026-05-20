@@ -8,6 +8,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { LocationProvider } from "@/context/LocationContext";
 import { CategoryProvider } from "@/context/CategoryContext";
+import { SectionProvider } from "@/context/SectionContext";
 import { OfferProvider } from "@/context/OfferContext";
 import { ProductProvider } from "@/context/ProductContext";
 import AppStateProvider from "@/components/AppStateProvider";
@@ -118,16 +119,18 @@ export default async function RootLayout({
               <ProductProvider>
                 <OfferProvider>
                   <CategoryProvider initialCategories={serializedCategories}>
-                    <AppStateProvider>
-                      <div className="app-shell">
-                        <MobileUILayer
-                          initialCategories={serializedCategories}
-                          initialBanners={serializedBanners}
-                        />
-                        {children}
-                      </div>
-                      <GlobalUI />
-                    </AppStateProvider>
+                    <SectionProvider>
+                      <AppStateProvider>
+                        <div className="app-shell">
+                          <MobileUILayer
+                            initialCategories={serializedCategories}
+                            initialBanners={serializedBanners}
+                          />
+                          {children}
+                        </div>
+                        <GlobalUI />
+                      </AppStateProvider>
+                    </SectionProvider>
                   </CategoryProvider>
                 </OfferProvider>
               </ProductProvider>

@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 import FloatingNav from "@/components/FloatingNav";
 import { subscribeToProducts } from "@/services/productService";
 import { useSearchParams } from 'next/navigation';
-import { useCategories } from '@/context/CategoryContext';
+import { useSections } from '@/context/SectionContext';
 import JsonLd, { getLocalBusinessSchema } from "@/components/JsonLd";
 
 interface HomeContentProps {
@@ -44,7 +44,7 @@ export default function HomeContent({
   initialBanners,
   initialOffers 
 }: HomeContentProps) {
-  const { categories, setCategories } = useCategories();
+  const { sections } = useSections();
   const [allProducts, setAllProducts] = useState<any[]>(initialProducts);
 
   // Real-time product subscription
@@ -56,72 +56,86 @@ export default function HomeContent({
     return () => unsubscribe();
   }, [initialProducts]);
 
-  // Filter active and non-deleted top-selling products
-  const topSellingProducts = React.useMemo(() => {
-    return allProducts.filter((p: any) => p.isTopSelling && !p.isDeleted);
-  }, [allProducts]);
-
-  const displayCategories = categories.length > 0 ? categories : initialCategories;
-  
-  // Use useMemo to prevent unnecessary re-renders of the category list mapping
+  // Use useMemo to compile active sections dynamically in their exact drag-and-drop order
   const categorySections = React.useMemo(() => {
-    return displayCategories.map((category, index) => {
-      const catProducts = allProducts.filter((p: any) => p.categorySlug === category.slug);
-      
-      if (category.slug === 'pickles') {
-        const isProductNonVeg = (p: any) => {
-          const nameLower = (p.name || '').toLowerCase();
-          const typeLower = (p.type || '').toLowerCase();
-          
-          const hasNonVegKeywords = nameLower.includes('chicken') || 
-                                    nameLower.includes('mutton') || 
-                                    nameLower.includes('fish') || 
-                                    nameLower.includes('prawn') || 
-                                    nameLower.includes('non-veg') ||
-                                    nameLower.includes('nonveg');
-                                    
-          const hasNonVegType = typeLower === 'nonveg' || typeLower === 'non-veg';
-          
-          return hasNonVegKeywords || hasNonVegType;
-        };
+    return sections.map((sec, index) => {
+      // Helper to classify non-veg products for backward compatibility
+      const isProductNonVeg = (p: any) => {
+        const nameLower = (p.name || '').toLowerCase();
+        const typeLower = (p.type || '').toLowerCase();
         
-        const vegPickles = catProducts.filter((p: any) => !isProductNonVeg(p));
-        const nonVegPickles = catProducts.filter((p: any) => isProductNonVeg(p));
+        const hasNonVegKeywords = nameLower.includes('chicken') || 
+                                  nameLower.includes('mutton') || 
+                                  nameLower.includes('fish') || 
+                                  nameLower.includes('prawn') || 
+                                  nameLower.includes('non-veg') ||
+                                  nameLower.includes('nonveg');
+                                  
+        const hasNonVegType = typeLower === 'nonveg' || typeLower === 'non-veg';
         
-        return (
-          <React.Fragment key={category.id || category.slug}>
-            {topSellingProducts.length > 0 && (
-              <TopSellingSection products={topSellingProducts} />
-            )}
-            {nonVegPickles.length > 0 && (
-              <CategorySection 
-                title="Non-Veg Pickles" 
-                slug={category.slug}
-                products={nonVegPickles} 
-                isAlternate={index % 2 === 0} 
-              />
-            )}
-            <CategorySection 
-              title="Traditional Veg Pickles" 
-              slug={category.slug}
-              products={vegPickles} 
-              isAlternate={index % 2 !== 0} 
-            />
-          </React.Fragment>
+        return hasNonVegKeywords || hasNonVegType;
+      };
+
+      // 1. Resolve products matching this section (Explicit binding + Dynamic category fallback)
+      let sectionProducts = [];
+
+      if (sec.slug === 'top-selling-specials') {
+        sectionProducts = allProducts.filter((p: any) => 
+          (p.isTopSelling || p.sections?.includes('top-selling-specials')) && !p.isDeleted
+        );
+      } else if (sec.slug === 'non-veg-pickles') {
+        sectionProducts = allProducts.filter((p: any) => 
+          (p.categorySlug === 'pickles' && isProductNonVeg(p)) || 
+          p.sections?.includes('non-veg-pickles')
+        );
+      } else if (sec.slug === 'traditional-veg-pickles') {
+        sectionProducts = allProducts.filter((p: any) => 
+          (p.categorySlug === 'pickles' && !isProductNonVeg(p)) || 
+          p.sections?.includes('traditional-veg-pickles')
+        );
+      } else {
+        // Custom created section OR standard categories row slug fallback
+        sectionProducts = allProducts.filter((p: any) => 
+          p.categorySlug === sec.slug || 
+          p.sections?.includes(sec.slug)
         );
       }
 
+      // Filter out soft-deleted items for UI rendering
+      const activeSectionProducts = sectionProducts.filter((p: any) => !p.isDeleted && p.isActive !== false);
+
+      // 2. If the section is empty, hide it gracefully
+      if (activeSectionProducts.length === 0) return null;
+
+      // 3. Render the dynamic element
+      if (sec.slug === 'top-selling-specials') {
+        return (
+          <TopSellingSection 
+            key={sec.id || sec.slug} 
+            products={activeSectionProducts} 
+          />
+        );
+      }
+
+      // Alternating row backgrounds for modern aesthetics
+      const isAlternate = index % 2 !== 0;
+
+      // Redirection slug for "View All" buttons on pickles partitioned sections
+      const targetSlug = (sec.slug === 'non-veg-pickles' || sec.slug === 'traditional-veg-pickles') 
+        ? 'pickles' 
+        : sec.slug;
+
       return (
         <CategorySection 
-          key={category.id || category.slug} 
-          title={category.name} 
-          slug={category.slug}
-          products={catProducts} 
-          isAlternate={index % 2 !== 0} 
+          key={sec.id || sec.slug} 
+          title={sec.name} 
+          slug={targetSlug}
+          products={activeSectionProducts} 
+          isAlternate={isAlternate} 
         />
       );
-    });
-  }, [displayCategories, allProducts]);
+    }).filter(Boolean); // Filter out empty null sections
+  }, [sections, allProducts]);
 
   return (
     <div className="pb-mobile-nav home-page">

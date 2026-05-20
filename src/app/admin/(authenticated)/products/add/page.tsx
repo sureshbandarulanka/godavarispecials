@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { addProduct, fetchFirebaseData, uploadProductImage, updateProduct } from '@/services/productService';
 import { useCategories } from '@/context/CategoryContext';
+import { useSections } from '@/context/SectionContext';
 import Link from 'next/link';
 import { 
   DndContext, 
@@ -33,6 +34,8 @@ export default function AddProductPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { categories } = useCategories();
+  const { sections } = useSections();
+  const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -153,6 +156,7 @@ export default function AddProductPage() {
         variants: variants.map(({ id, ...rest }) => rest),
         image: '', // Primary image (first one)
         images: [], // All images
+        sections: selectedSections,
         createdAt: new Date().toISOString()
       };
 
@@ -280,7 +284,17 @@ export default function AddProductPage() {
                       type="checkbox" 
                       name="isTopSelling"
                       checked={formData.isTopSelling}
-                      onChange={(e) => setFormData({ ...formData, isTopSelling: e.target.checked })}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData({ ...formData, isTopSelling: checked });
+                        if (checked) {
+                          if (!selectedSections.includes('top-selling-specials')) {
+                            setSelectedSections([...selectedSections, 'top-selling-specials']);
+                          }
+                        } else {
+                          setSelectedSections(selectedSections.filter(s => s !== 'top-selling-specials'));
+                        }
+                      }}
                     />
                     <span className="slider round"></span>
                   </label>
@@ -291,6 +305,41 @@ export default function AddProductPage() {
               </div>
               <div className="form-group">
                 {/* Kept empty for two-column symmetry */}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group" style={{ width: '100%' }}>
+                <label className="form-label">Select Homepage Sections</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '8px' }}>
+                  {sections.map((sec) => (
+                    <label key={sec.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#334155' }}>
+                      <input
+                        type="checkbox"
+                        value={sec.slug}
+                        checked={selectedSections.includes(sec.slug)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedSections([...selectedSections, sec.slug]);
+                            if (sec.slug === 'top-selling-specials') {
+                              setFormData(prev => ({ ...prev, isTopSelling: true }));
+                            }
+                          } else {
+                            setSelectedSections(selectedSections.filter(s => s !== sec.slug));
+                            if (sec.slug === 'top-selling-specials') {
+                              setFormData(prev => ({ ...prev, isTopSelling: false }));
+                            }
+                          }
+                        }}
+                        style={{ width: '16px', height: '16px', accentColor: '#f97316' }}
+                      />
+                      <span>{sec.name}</span>
+                    </label>
+                  ))}
+                </div>
+                <p style={{ color: '#64748b', fontSize: '11px', margin: '6px 0 0 0' }}>
+                  Choose which homepage rows this product should be displayed in. Standard categories will fall back automatically.
+                </p>
               </div>
             </div>
 

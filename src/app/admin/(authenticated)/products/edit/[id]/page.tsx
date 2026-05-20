@@ -4,6 +4,7 @@ import React, { useState, useEffect, use, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateProduct, getProductByIdAsync, fetchFirebaseData, uploadProductImage } from '@/services/productService';
 import { useCategories } from '@/context/CategoryContext';
+import { useSections } from '@/context/SectionContext';
 import Link from 'next/link';
 import { 
   DndContext, 
@@ -34,6 +35,8 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const { id } = use(params);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { categories } = useCategories();
+  const { sections } = useSections();
+  const [selectedSections, setSelectedSections] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -139,6 +142,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
           // Load images array if exists, otherwise fallback to single image
           const images = product.images || (product.image ? [product.image] : []);
           setExistingImages(images);
+          setSelectedSections((product as any).sections || (product.isTopSelling ? ['top-selling-specials'] : []));
           setVariants((product.variants || []).map((v: any) => ({ ...v, id: Math.random().toString(36).substr(2, 9) })));
         } else {
           alert('Product not found');
@@ -225,6 +229,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         image: finalImages[0] || '', // Primary image
         images: finalImages,
         variants: variants.map(({ id, ...rest }) => rest),
+        sections: selectedSections,
         updatedAt: new Date().toISOString()
       };
 
@@ -348,7 +353,17 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                       type="checkbox" 
                       name="isTopSelling"
                       checked={formData.isTopSelling}
-                      onChange={(e) => setFormData({ ...formData, isTopSelling: e.target.checked })}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setFormData({ ...formData, isTopSelling: checked });
+                        if (checked) {
+                          if (!selectedSections.includes('top-selling-specials')) {
+                            setSelectedSections([...selectedSections, 'top-selling-specials']);
+                          }
+                        } else {
+                          setSelectedSections(selectedSections.filter(s => s !== 'top-selling-specials'));
+                        }
+                      }}
                     />
                     <span className="slider round"></span>
                   </label>
@@ -359,6 +374,41 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               </div>
               <div className="form-group">
                 {/* Kept empty for two-column symmetry */}
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group" style={{ width: '100%' }}>
+                <label className="form-label">Select Homepage Sections</label>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '8px' }}>
+                  {sections.map((sec) => (
+                    <label key={sec.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#334155' }}>
+                      <input
+                        type="checkbox"
+                        value={sec.slug}
+                        checked={selectedSections.includes(sec.slug)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedSections([...selectedSections, sec.slug]);
+                            if (sec.slug === 'top-selling-specials') {
+                              setFormData(prev => ({ ...prev, isTopSelling: true }));
+                            }
+                          } else {
+                            setSelectedSections(selectedSections.filter(s => s !== sec.slug));
+                            if (sec.slug === 'top-selling-specials') {
+                              setFormData(prev => ({ ...prev, isTopSelling: false }));
+                            }
+                          }
+                        }}
+                        style={{ width: '16px', height: '16px', accentColor: '#f97316' }}
+                      />
+                      <span>{sec.name}</span>
+                    </label>
+                  ))}
+                </div>
+                <p style={{ color: '#64748b', fontSize: '11px', margin: '6px 0 0 0' }}>
+                  Choose which homepage rows this product should be displayed in. Standard categories will fall back automatically.
+                </p>
               </div>
             </div>
 
