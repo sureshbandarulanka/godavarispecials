@@ -70,13 +70,19 @@ export default function HomeContent({
       
       if (category.slug === 'pickles') {
         const isProductNonVeg = (p: any) => {
-          if (p.type) return p.type === 'nonveg';
           const nameLower = (p.name || '').toLowerCase();
-          return nameLower.includes('chicken') || 
-                 nameLower.includes('mutton') || 
-                 nameLower.includes('fish') || 
-                 nameLower.includes('prawns') || 
-                 nameLower.includes('prawn');
+          const typeLower = (p.type || '').toLowerCase();
+          
+          const hasNonVegKeywords = nameLower.includes('chicken') || 
+                                    nameLower.includes('mutton') || 
+                                    nameLower.includes('fish') || 
+                                    nameLower.includes('prawn') || 
+                                    nameLower.includes('non-veg') ||
+                                    nameLower.includes('nonveg');
+                                    
+          const hasNonVegType = typeLower === 'nonveg' || typeLower === 'non-veg';
+          
+          return hasNonVegKeywords || hasNonVegType;
         };
         
         const vegPickles = catProducts.filter((p: any) => !isProductNonVeg(p));
