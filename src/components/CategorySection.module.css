@@ -1,6 +1,6 @@
 .section {
-  padding: 16px 0;
-  margin-bottom: 40px; 
+  padding: 8px 0;
+  margin-bottom: 0px; 
 }
 
 .alternateBg {
@@ -123,8 +123,8 @@
   }
 
   .section {
-    padding: 8px 0;
-    margin-bottom: 12px;
+    padding: 4px 0;
+    margin-bottom: 0px;
   }
 
   .title {

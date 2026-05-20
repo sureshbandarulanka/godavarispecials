@@ -1,6 +1,6 @@
 .section {
-  padding: 24px 0;
-  margin-bottom: 32px;
+  padding: 12px 0;
+  margin-bottom: 0px;
   background: linear-gradient(180deg, #fffcf0 0%, #ffffff 100%); /* Elegant warm theme background */
   border-top: 1px solid rgba(254, 204, 88, 0.2);
   border-bottom: 1px solid rgba(254, 204, 88, 0.2);
@@ -102,8 +102,8 @@
 
 @media (max-width: 768px) {
   .section {
-    padding: 16px 0;
-    margin-bottom: 20px;
+    padding: 8px 0;
+    margin-bottom: 0px;
   }
 
   .header {

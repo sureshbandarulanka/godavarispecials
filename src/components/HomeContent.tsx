@@ -104,6 +104,9 @@ export default function HomeContent({
                 isAlternate={index % 2 === 0} 
               />
             )}
+            {topSellingProducts.length > 0 && (
+              <TopSellingSection products={topSellingProducts} />
+            )}
           </React.Fragment>
         );
       }
@@ -130,7 +133,6 @@ export default function HomeContent({
         <HeroBanner initialBanners={initialBanners} />
         <HomeGiftPromo />
         <CategoriesRow initialCategories={initialCategories} />
-        {topSellingProducts.length > 0 && <TopSellingSection products={topSellingProducts} />}
         <BestOffers initialOffers={initialOffers} />
         {categorySections}
       </main>
