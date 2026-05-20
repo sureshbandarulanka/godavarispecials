@@ -152,6 +152,12 @@ export default function ProductCard({ product }: { product: Product }) {
           </div>
         )}
 
+        {product.isTopSelling && (
+          <div className={`${styles.topSellingBadge} ${product.isOutOfStock ? styles.topSellingWithStockBadge : ''}`}>
+            🔥 BEST SELLER
+          </div>
+        )}
+
         {product.image || (product.images && product.images.length > 0) ? (
           <Image 
             src={product.image || product.images![0]} 

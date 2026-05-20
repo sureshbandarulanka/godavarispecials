@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { getProducts, fetchFirebaseData, deleteProduct, deleteProductsBulk, restoreProductAsync, emptyBinAsync, getCategoriesAsync, updateProductsOrder } from '@/services/productService';
+import { getProducts, fetchFirebaseData, deleteProduct, deleteProductsBulk, restoreProductAsync, emptyBinAsync, getCategoriesAsync, updateProductsOrder, updateProduct } from '@/services/productService';
 import { Archive, RotateCcw, Trash2, GripVertical } from 'lucide-react';
 import { Product } from '@/data/products';
 import {
@@ -128,6 +128,17 @@ export default function AdminProductsPage() {
       await loadData();
     } catch (err) {
       alert('Failed to restore product');
+    }
+  };
+
+  const handleToggleTopSelling = async (id: string | number, isTopSelling: boolean) => {
+    try {
+      await updateProduct(id.toString(), { isTopSelling });
+      setToast(isTopSelling ? 'Added to Top Selling!' : 'Removed from Top Selling');
+      await loadData();
+      setTimeout(() => setToast(null), 3000);
+    } catch (err) {
+      alert('Failed to update Top Selling status');
     }
   };
 
@@ -281,6 +292,7 @@ export default function AdminProductsPage() {
                     <th style={{ background: 'transparent', border: 'none' }}>Product</th>
                     <th style={{ background: 'transparent', border: 'none' }}>Category</th>
                     <th style={{ background: 'transparent', border: 'none' }}>Price (from)</th>
+                    <th style={{ background: 'transparent', border: 'none', textAlign: 'center' }}>Top Selling</th>
                     <th style={{ background: 'transparent', border: 'none' }}>Actions</th>
                   </tr>
                 </thead>
@@ -297,6 +309,7 @@ export default function AdminProductsPage() {
                         toggleSelect={toggleSelect}
                         setDeleteId={setDeleteId}
                         handleRestore={handleRestore}
+                        onToggleTopSelling={handleToggleTopSelling}
                         activeTab={activeTab}
                       />
                     ))}
@@ -485,7 +498,8 @@ const SortableProductRow = ({
   toggleSelect,
   setDeleteId,
   handleRestore,
-  activeTab
+  activeTab,
+  onToggleTopSelling
 }: any) => {
   const {
     attributes,
@@ -583,6 +597,40 @@ const SortableProductRow = ({
         <span className="badge badge-info">{product.category}</span>
       </td>
       <td style={{ borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0' }}>{getMinPrice(product)}</td>
+      <td style={{ borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', textAlign: 'center' }}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleTopSelling(product.id, !product.isTopSelling);
+          }}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '8px',
+            color: product.isTopSelling ? '#f59e0b' : '#cbd5e1',
+            transition: 'transform 0.15s ease, color 0.15s ease',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          title={product.isTopSelling ? 'Remove from Top Selling' : 'Mark as Top Selling'}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill={product.isTopSelling ? '#f59e0b' : 'none'}
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ transition: 'transform 0.15s ease' }}
+          >
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+          </svg>
+        </button>
+      </td>
       <td style={{ borderTopRightRadius: '8px', borderBottomRightRadius: '8px', borderTop: '1px solid #e2e8f0', borderBottom: '1px solid #e2e8f0', borderRight: '1px solid #e2e8f0' }}>
         <div className="actions-cell">
           {!product.isDeleted ? (

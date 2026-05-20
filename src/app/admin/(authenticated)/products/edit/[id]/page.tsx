@@ -45,6 +45,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     description: '',
     type: 'veg' as 'veg' | 'non-veg' | 'sweet' | 'pindi-vantalu' | 'hot-snacks' | 'ghee' | 'oil',
     isOutOfStock: false,
+    isTopSelling: false,
   });
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
@@ -132,6 +133,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             description: product.description || '',
             type: product.type || 'veg',
             isOutOfStock: product.isOutOfStock || false,
+            isTopSelling: product.isTopSelling || false,
           });
           
           // Load images array if exists, otherwise fallback to single image
@@ -334,6 +336,29 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
                     {formData.isOutOfStock ? 'Out of Stock' : 'In Stock'}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Highlight as Top Selling</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', height: '44px' }}>
+                  <label className="switch">
+                    <input 
+                      type="checkbox" 
+                      name="isTopSelling"
+                      checked={formData.isTopSelling}
+                      onChange={(e) => setFormData({ ...formData, isTopSelling: e.target.checked })}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: formData.isTopSelling ? '#f59e0b' : '#64748b' }}>
+                    {formData.isTopSelling ? '🔥 Yes, Top Selling Highlighted' : 'Regular Product'}
+                  </span>
+                </div>
+              </div>
+              <div className="form-group">
+                {/* Kept empty for two-column symmetry */}
               </div>
             </div>
 

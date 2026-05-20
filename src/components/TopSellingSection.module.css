@@ -1,0 +1,149 @@
+.section {
+  padding: 24px 0;
+  margin-bottom: 32px;
+  background: linear-gradient(180deg, #fffcf0 0%, #ffffff 100%); /* Elegant warm theme background */
+  border-top: 1px solid rgba(254, 204, 88, 0.2);
+  border-bottom: 1px solid rgba(254, 204, 88, 0.2);
+  box-shadow: inset 0 1px 4px rgba(254, 204, 88, 0.05), inset 0 -1px 4px rgba(254, 204, 88, 0.05);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.headerTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flameIcon {
+  font-size: 24px;
+  animation: pulse-flame 2s infinite ease-in-out;
+}
+
+@keyframes pulse-flame {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 6px #f97316); }
+  100% { transform: scale(1); }
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+.scrollButtons {
+  display: flex;
+  gap: 8px;
+}
+
+.scrollBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #334155;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.scrollBtn:hover {
+  background: #f59e0b; /* Brand gold */
+  color: white;
+  border-color: #f59e0b;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.scrollBtn:active {
+  transform: scale(0.9);
+}
+
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.carousel {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding: 8px 4px 24px 4px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  scroll-behavior: smooth;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.carouselItem {
+  flex: 0 0 calc(50% - 10px); /* Default for tablet/mobile fallback */
+  transition: transform 0.3s;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 16px 0;
+    margin-bottom: 20px;
+  }
+
+  .header {
+    margin-bottom: 12px;
+    padding: 0 16px;
+  }
+
+  .title {
+    font-size: 17px;
+  }
+
+  .flameIcon {
+    font-size: 20px;
+  }
+
+  .scrollButtons {
+    display: none; /* Scroll buttons hidden on mobile */
+  }
+
+  .carousel {
+    gap: 12px;
+    padding-bottom: 12px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .carouselItem {
+    flex: 0 0 46%; /* 2 cards visible with peek */
+  }
+}
+
+@media (min-width: 769px) {
+  .carouselItem {
+    flex: 0 0 calc(33.333% - 14px); /* 3 cards on mid sizes */
+  }
+}
+
+@media (min-width: 1024px) {
+  .carouselItem {
+    flex: 0 0 calc(20% - 16px); /* 5 cards per row on desktop */
+    max-width: 230px;
+  }
+}

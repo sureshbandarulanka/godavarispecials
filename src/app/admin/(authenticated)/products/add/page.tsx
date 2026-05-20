@@ -43,6 +43,7 @@ export default function AddProductPage() {
     description: '',
     type: 'veg' as 'veg' | 'non-veg' | 'sweet' | 'pindi-vantalu' | 'hot-snacks' | 'ghee' | 'oil',
     isOutOfStock: false,
+    isTopSelling: false,
   });
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
@@ -267,6 +268,29 @@ export default function AddProductPage() {
                     {formData.isOutOfStock ? 'Out of Stock' : 'In Stock'}
                   </span>
                 </div>
+              </div>
+            </div>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Highlight as Top Selling</label>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', height: '44px' }}>
+                  <label className="switch">
+                    <input 
+                      type="checkbox" 
+                      name="isTopSelling"
+                      checked={formData.isTopSelling}
+                      onChange={(e) => setFormData({ ...formData, isTopSelling: e.target.checked })}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                  <span style={{ fontSize: '14px', fontWeight: 500, color: formData.isTopSelling ? '#f59e0b' : '#64748b' }}>
+                    {formData.isTopSelling ? '🔥 Yes, Top Selling Highlighted' : 'Regular Product'}
+                  </span>
+                </div>
+              </div>
+              <div className="form-group">
+                {/* Kept empty for two-column symmetry */}
               </div>
             </div>
 

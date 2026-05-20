@@ -6,6 +6,7 @@ import CategoriesRow from "@/components/CategoriesRow";
 import BestOffers from "@/components/BestOffers";
 import HomeGiftPromo from "@/components/HomeGiftPromo";
 import CategorySection from "@/components/CategorySection";
+import TopSellingSection from "@/components/TopSellingSection";
 import Footer from "@/components/Footer";
 import FloatingNav from "@/components/FloatingNav";
 import { subscribeToProducts } from "@/services/productService";
@@ -55,6 +56,11 @@ export default function HomeContent({
     return () => unsubscribe();
   }, [initialProducts]);
 
+  // Filter active and non-deleted top-selling products
+  const topSellingProducts = React.useMemo(() => {
+    return allProducts.filter((p: any) => p.isTopSelling && !p.isDeleted);
+  }, [allProducts]);
+
   const displayCategories = categories.length > 0 ? categories : initialCategories;
   
   // Use useMemo to prevent unnecessary re-renders of the category list mapping
@@ -83,6 +89,7 @@ export default function HomeContent({
         <HeroBanner initialBanners={initialBanners} />
         <HomeGiftPromo />
         <CategoriesRow initialCategories={initialCategories} />
+        {topSellingProducts.length > 0 && <TopSellingSection products={topSellingProducts} />}
         <BestOffers initialOffers={initialOffers} />
         {categorySections}
       </main>

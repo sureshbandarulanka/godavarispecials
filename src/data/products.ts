@@ -27,6 +27,7 @@ export interface Product {
   endDate?: string | Date | null;
   isDeleted?: boolean;
   priority?: number;
+  isTopSelling?: boolean;
 }
 
 export const CATEGORIES: string[] = [];
