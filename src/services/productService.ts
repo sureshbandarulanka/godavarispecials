@@ -646,10 +646,12 @@ export const getCategoriesAsync = async () => {
   try {
     const categoriesQuery = query(collection(db, "categories"), orderBy("name", "asc"));
     const querySnapshot = await getDocs(categoriesQuery);
-    const categories = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as any[];
+    const categories = querySnapshot.docs
+      .map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }))
+      .filter(cat => cat.id !== "_sections_config") as any[];
 
     // Apply the same custom sort as CategoryContext to prevent layout jumps
     return categories.sort((a, b) => {

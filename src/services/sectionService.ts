@@ -1,15 +1,11 @@
 import { db } from "@/lib/firebase";
 import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
   doc, 
+  getDoc, 
+  setDoc,
+  getDocs,
+  collection,
   serverTimestamp, 
-  writeBatch, 
-  query, 
-  orderBy, 
   onSnapshot 
 } from "firebase/firestore";
 
@@ -22,26 +18,34 @@ export interface Section {
   isActive?: boolean;
   isDeleted?: boolean;
   createdAt?: any;
+  updatedAt?: any;
 }
+
+const CONFIG_DOC_ID = "_sections_config";
 
 // ✅ Real-time Section Listener
 export const subscribeToSections = (
   callback: (sections: Section[]) => void,
   onError?: (err: any) => void
 ): (() => void) => {
-  const sectionsQuery = query(collection(db, "sections"), orderBy("order", "asc"));
+  const docRef = doc(db, "categories", CONFIG_DOC_ID);
 
   return onSnapshot(
-    sectionsQuery,
+    docRef,
     (snapshot) => {
-      const sections = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as Section[];
-
-      // Filter out deleted sections
-      const activeSections = sections.filter(s => !s.isDeleted);
-      callback(activeSections);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        const sections = (data.sectionsList || []) as Section[];
+        
+        // Filter out deleted sections and sort by order
+        const activeSections = sections
+          .filter(s => !s.isDeleted)
+          .sort((a, b) => a.order - b.order);
+        callback(activeSections);
+      } else {
+        // If document doesn't exist, trigger callback with empty array so seed logic fires
+        callback([]);
+      }
     },
     (error) => {
       console.error("Real-time sections listener error:", error);
@@ -53,12 +57,16 @@ export const subscribeToSections = (
 // ✅ Fetch Sections (One-time)
 export const getSectionsAsync = async (): Promise<Section[]> => {
   try {
-    const querySnapshot = await getDocs(collection(db, "sections"));
-    const list = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    })) as Section[];
-    return list.filter(s => !s.isDeleted).sort((a, b) => a.order - b.order);
+    const docRef = doc(db, "categories", CONFIG_DOC_ID);
+    const snapshot = await getDoc(docRef);
+    if (snapshot.exists()) {
+      const data = snapshot.data();
+      const sections = (data.sectionsList || []) as Section[];
+      return sections
+        .filter(s => !s.isDeleted)
+        .sort((a, b) => a.order - b.order);
+    }
+    return [];
   } catch (error) {
     console.error("Error fetching sections:", error);
     return [];
@@ -78,7 +86,6 @@ export const seedDefaultSections = async () => {
     }
 
     console.log("🌱 Seeding default sections...");
-    const batch = writeBatch(db);
     
     // 1. Fetch categories to get automatic category sections
     const categorySnap = await getDocs(collection(db, "categories"));
@@ -87,11 +94,12 @@ export const seedDefaultSections = async () => {
       ...d.data()
     })) as any[];
 
-    const activeCategories = categories.filter(c => !c.isDeleted);
+    const activeCategories = categories.filter(c => c.id !== CONFIG_DOC_ID && !c.isDeleted);
 
     // 2. Define our base dynamic sections
-    const defaultSections: Omit<Section, "id">[] = [
+    const defaultSections: Section[] = [
       {
+        id: "top-selling-specials",
         name: "Top Selling Specials",
         slug: "top-selling-specials",
         order: 0,
@@ -99,6 +107,7 @@ export const seedDefaultSections = async () => {
         isActive: true,
       },
       {
+        id: "non-veg-pickles",
         name: "Non-Veg Pickles",
         slug: "non-veg-pickles",
         order: 1,
@@ -106,6 +115,7 @@ export const seedDefaultSections = async () => {
         isActive: true,
       },
       {
+        id: "traditional-veg-pickles",
         name: "Traditional Veg Pickles",
         slug: "traditional-veg-pickles",
         order: 2,
@@ -119,6 +129,7 @@ export const seedDefaultSections = async () => {
     activeCategories.forEach((cat) => {
       if (cat.slug !== "pickles") {
         defaultSections.push({
+          id: cat.id || cat.slug || `sec_${Math.random().toString(36).substring(2, 9)}`,
           name: cat.name,
           slug: cat.slug,
           order: currentOrder++,
@@ -128,16 +139,15 @@ export const seedDefaultSections = async () => {
       }
     });
 
-    // 4. Commit to database
-    for (const sec of defaultSections) {
-      const newDocRef = doc(collection(db, "sections"));
-      batch.set(newDocRef, {
-        ...sec,
-        createdAt: serverTimestamp()
-      });
-    }
+    // 4. Save to categories collection config doc
+    const docRef = doc(db, "categories", CONFIG_DOC_ID);
+    await setDoc(docRef, {
+      sectionsList: defaultSections,
+      isSystemConfig: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
 
-    await batch.commit();
     console.log("✅ Successfully seeded default sections!");
   } catch (error) {
     console.error("❌ Failed to seed default sections:", error);
@@ -147,17 +157,37 @@ export const seedDefaultSections = async () => {
 // ✅ Add Section
 export const addSection = async (section: Omit<Section, "id" | "order">) => {
   try {
-    const existing = await getSectionsAsync();
-    const nextOrder = existing.length > 0 ? Math.max(...existing.map(s => s.order)) + 1 : 0;
+    const docRef = doc(db, "categories", CONFIG_DOC_ID);
+    const snapshot = await getDoc(docRef);
+    
+    let currentSections: Section[] = [];
+    if (snapshot.exists()) {
+      currentSections = (snapshot.data().sectionsList || []) as Section[];
+    }
 
-    const docRef = await addDoc(collection(db, "sections"), {
+    const nextOrder = currentSections.length > 0 
+      ? Math.max(...currentSections.map(s => s.order)) + 1 
+      : 0;
+
+    const newId = `sec_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const newSection: Section = {
       ...section,
+      id: newId,
       order: nextOrder,
       isActive: true,
       isDeleted: false,
-      createdAt: serverTimestamp()
-    });
-    return docRef.id;
+      createdAt: new Date().toISOString()
+    };
+
+    currentSections.push(newSection);
+
+    await setDoc(docRef, {
+      sectionsList: currentSections,
+      isSystemConfig: true,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    return newId;
   } catch (error) {
     console.error("Error adding section:", error);
     throw error;
@@ -165,13 +195,32 @@ export const addSection = async (section: Omit<Section, "id" | "order">) => {
 };
 
 // ✅ Update Section
-export const updateSection = async (id: string, section: Partial<Section>) => {
+export const updateSection = async (id: string, updatedFields: Partial<Section>) => {
   try {
-    const docRef = doc(db, "sections", id);
-    await updateDoc(docRef, {
-      ...section,
-      updatedAt: serverTimestamp()
+    const docRef = doc(db, "categories", CONFIG_DOC_ID);
+    const snapshot = await getDoc(docRef);
+    
+    if (!snapshot.exists()) {
+      throw new Error("Sections configuration document does not exist");
+    }
+
+    const currentSections = (snapshot.data().sectionsList || []) as Section[];
+    const updatedSections = currentSections.map((sec) => {
+      if (sec.id === id) {
+        return {
+          ...sec,
+          ...updatedFields,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return sec;
     });
+
+    await setDoc(docRef, {
+      sectionsList: updatedSections,
+      isSystemConfig: true,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
   } catch (error) {
     console.error("Error updating section:", error);
     throw error;
@@ -181,11 +230,7 @@ export const updateSection = async (id: string, section: Partial<Section>) => {
 // ✅ Delete Section (Soft delete to prevent breaking frontend query states)
 export const deleteSection = async (id: string) => {
   try {
-    const docRef = doc(db, "sections", id);
-    await updateDoc(docRef, { 
-      isDeleted: true, 
-      updatedAt: serverTimestamp() 
-    });
+    await updateSection(id, { isDeleted: true });
   } catch (error) {
     console.error("Error soft deleting section:", error);
     throw error;
@@ -195,12 +240,28 @@ export const deleteSection = async (id: string) => {
 // ✅ Update Sections Order
 export const updateSectionsOrder = async (orderedIds: string[]) => {
   try {
-    const batch = writeBatch(db);
-    orderedIds.forEach((id, index) => {
-      const docRef = doc(db, "sections", id);
-      batch.update(docRef, { order: index });
+    const docRef = doc(db, "categories", CONFIG_DOC_ID);
+    const snapshot = await getDoc(docRef);
+    
+    if (!snapshot.exists()) {
+      throw new Error("Sections configuration document does not exist");
+    }
+
+    const currentSections = (snapshot.data().sectionsList || []) as Section[];
+    const updatedSections = currentSections.map((sec) => {
+      const newOrder = orderedIds.indexOf(sec.id);
+      if (newOrder !== -1) {
+        return { ...sec, order: newOrder };
+      }
+      return sec;
     });
-    await batch.commit();
+
+    await setDoc(docRef, {
+      sectionsList: updatedSections,
+      isSystemConfig: true,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
     console.log("✅ Sections order updated successfully");
   } catch (error) {
     console.error("Error updating sections order:", error);

@@ -43,10 +43,12 @@ export const CategoryProvider = ({
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const catList: Category[] = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        } as Category));
+        const catList: Category[] = snapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+          } as Category))
+          .filter((cat) => cat.id !== "_sections_config");
         
         // Custom sort to prioritize 'order' field
         catList.sort((a, b) => {
