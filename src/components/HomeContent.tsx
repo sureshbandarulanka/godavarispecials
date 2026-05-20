@@ -67,6 +67,41 @@ export default function HomeContent({
   const categorySections = React.useMemo(() => {
     return displayCategories.map((category, index) => {
       const catProducts = allProducts.filter((p: any) => p.categorySlug === category.slug);
+      
+      if (category.slug === 'pickles') {
+        const isProductNonVeg = (p: any) => {
+          if (p.type) return p.type === 'nonveg';
+          const nameLower = (p.name || '').toLowerCase();
+          return nameLower.includes('chicken') || 
+                 nameLower.includes('mutton') || 
+                 nameLower.includes('fish') || 
+                 nameLower.includes('prawns') || 
+                 nameLower.includes('prawn');
+        };
+        
+        const vegPickles = catProducts.filter((p: any) => !isProductNonVeg(p));
+        const nonVegPickles = catProducts.filter((p: any) => isProductNonVeg(p));
+        
+        return (
+          <React.Fragment key={category.id || category.slug}>
+            <CategorySection 
+              title="Traditional Veg Pickles" 
+              slug={category.slug}
+              products={vegPickles} 
+              isAlternate={index % 2 !== 0} 
+            />
+            {nonVegPickles.length > 0 && (
+              <CategorySection 
+                title="Non-Veg Pickles" 
+                slug={category.slug}
+                products={nonVegPickles} 
+                isAlternate={index % 2 === 0} 
+              />
+            )}
+          </React.Fragment>
+        );
+      }
+
       return (
         <CategorySection 
           key={category.id || category.slug} 
