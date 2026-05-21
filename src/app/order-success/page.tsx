@@ -35,7 +35,7 @@ interface OrderData {
   };
   deliveryFee: number;
   paymentMethod: string;
-  address: { pincode: string; address: string; name: string; mobile: string; landmark?: string; address1?: string; address2?: string; city?: string; phone?: string; email?: string };
+  address: { pincode: string; address: string; name: string; mobile: string; landmark?: string; address1?: string; address2?: string; city?: string; state?: string; phone?: string; email?: string };
   status?: string;
   hasFreeGift?: boolean;
   giftName?: string;
@@ -147,6 +147,7 @@ function OrderSuccessContent() {
       order.address.address1 || order.address.address,
       order.address.landmark ? `Landmark: ${order.address.landmark}` : null,
       order.address.city,
+      order.address.state || null,
       order.address.pincode
     ].filter(Boolean).join(', ');
 

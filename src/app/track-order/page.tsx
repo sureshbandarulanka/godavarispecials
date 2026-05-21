@@ -119,7 +119,7 @@ export default function TrackOrderPage() {
                   <h3><MapPin size={18} /> Delivery Address</h3>
                   <p><strong>{order.address.name}</strong></p>
                   <p>{order.address.address1}</p>
-                  <p>{order.address.city} - {order.address.pincode}</p>
+                  <p>{order.address.city}{order.address.state ? `, ${order.address.state}` : ''} - {order.address.pincode}</p>
                 </div>
                 {order.status !== 'Placed' && order.status !== 'Confirmed' && order.trackingId && (
                   <div className={styles.trackingInfo}>
@@ -203,7 +203,7 @@ export default function TrackOrderPage() {
                 <div className="track-detail-text">
                   <div className="track-detail-title">Delivery Address</div>
                   <div className="track-detail-value">
-                    {order.address.name} · {order.address.address1}, {order.address.city} — {order.address.pincode}
+                    {order.address.name} · {order.address.address1}, {order.address.city}{order.address.state ? `, ${order.address.state}` : ''} — {order.address.pincode}
                   </div>
                 </div>
               </div>

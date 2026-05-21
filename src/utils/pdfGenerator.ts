@@ -123,7 +123,10 @@ export const generateOrderPDF = async (order: any, type: 'INVOICE' | 'BILL' = 'I
   doc.setFont('helvetica', 'normal');
   doc.text(order.address.name, 100, infoStartY + 5);
   doc.text(`${order.address.address1 || order.address.address}, ${order.address.address2 || ''}`, 100, infoStartY + 10, { maxWidth: 80 });
-  doc.text(`${order.address.city} - ${order.address.pincode}`, 100, infoStartY + 20);
+  const cityStateStr = order.address.state 
+    ? `${order.address.city}, ${order.address.state} - ${order.address.pincode}`
+    : `${order.address.city} - ${order.address.pincode}`;
+  doc.text(cityStateStr, 100, infoStartY + 20);
   doc.text(`Phone: ${order.address.phone || order.address.mobile}`, 100, infoStartY + 25);
 
   // 3. Items Table - Shifted down

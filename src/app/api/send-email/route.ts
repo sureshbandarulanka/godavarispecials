@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
       address.address1,
       address.address2,
       address.city,
+      address.state || null,
       address.pincode
     ].filter(Boolean).join(', ');
 

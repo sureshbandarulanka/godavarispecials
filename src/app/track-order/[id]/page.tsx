@@ -205,7 +205,9 @@ export default function OrderTrackingDetails() {
                 <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
                   <div>{order.address.address1}</div>
                   {order.address.address2 && <div>{order.address.address2}</div>}
-                  <div style={{ fontWeight: 600 }}>{order.address.city} - {order.address.pincode}</div>
+                  <div style={{ fontWeight: 600 }}>
+                    {order.address.city}{order.address.state ? `, ${order.address.state}` : ''} - {order.address.pincode}
+                  </div>
                 </div>
                 <div style={{ marginTop: '16px', padding: '12px', background: '#eff6ff', borderRadius: '10px', color: '#1d4ed8', fontSize: '12px', fontWeight: 500 }}>
                   Payment Method: {order.paymentMethod === 'COD' ? 'Cash on Delivery' : 'Paid Online'}

@@ -22,6 +22,7 @@ interface Address {
   address2: string;
   city: string;
   pincode: string;
+  state?: string;
 }
 
 // Removed static image icons to use Lucide icons for better performance and consistency
@@ -53,6 +54,8 @@ export default function CheckoutPage() {
   // Gift Settings
   const [giftSettings, setGiftSettings] = useState<any>(null);
   
+  // Pincode Lookup State (Removed API lookup in favor of active location context)
+
   // Form State
   const [formData, setFormData] = useState<Omit<Address, 'id'>>({
     name: '',
@@ -61,7 +64,8 @@ export default function CheckoutPage() {
     address1: '',
     address2: '',
     city: '',
-    pincode: ''
+    pincode: '',
+    state: ''
   });
 
   useEffect(() => {
@@ -109,6 +113,23 @@ export default function CheckoutPage() {
       }
     };
   }, [user]);
+
+  // Sync empty form fields with active location context upon form opening
+  useEffect(() => {
+    if (isFormOpen && !editingAddressId && location) {
+      setFormData(prev => {
+        if (!prev.city && !prev.state && !prev.pincode) {
+          return {
+            ...prev,
+            city: location.city || '',
+            state: location.state || '',
+            pincode: location.pincode || ''
+          };
+        }
+        return prev;
+      });
+    }
+  }, [isFormOpen, editingAddressId, location]);
 
   // Handle Smart Auto-Apply Logic
   useEffect(() => {
@@ -192,9 +213,19 @@ export default function CheckoutPage() {
   const isGiftEligible = !!currentGift;
   const amountNeededForGift = nextTier ? Math.ceil(nextTier.threshold - productValue) : 0;
 
+  const handlePincodeChange = (value: string) => {
+    // Keep only numeric characters
+    const cleanValue = value.replace(/\D/g, '').slice(0, 6);
+    
+    setFormData(prev => ({
+      ...prev,
+      pincode: cleanValue
+    }));
+  };
+
   const handleSaveAddress = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name || !formData.phone || !formData.address1 || !formData.pincode) {
+    if (!formData.name || !formData.phone || !formData.address1 || !formData.pincode || !formData.city) {
       alert("Please fill all required fields");
       return;
     }
@@ -228,7 +259,10 @@ export default function CheckoutPage() {
 
   const handleEditAddress = (addr: Address, e: React.MouseEvent) => {
     e.stopPropagation();
-    setFormData(addr);
+    setFormData({
+      ...addr,
+      state: addr.state || ''
+    });
     setEditingAddressId(addr.id);
     setIsFormOpen(true);
   };
@@ -503,7 +537,8 @@ export default function CheckoutPage() {
                       address1: '', 
                       address2: '', 
                       city: location?.city || 'Rajahmundry', 
-                      pincode: location?.pincode || '' 
+                      pincode: location?.pincode || '',
+                      state: location?.state || '' 
                     });
                   }}>+ Add New</button>
                 )}
@@ -527,7 +562,14 @@ export default function CheckoutPage() {
                     </div>
                     <div className={styles.formGroup}>
                       <label>Pincode *</label>
-                      <input type="text" value={formData.pincode} onChange={e => setFormData({...formData, pincode: e.target.value})} required placeholder="6-digit pincode" maxLength={6} />
+                      <input 
+                        type="text" 
+                        value={formData.pincode} 
+                        onChange={e => handlePincodeChange(e.target.value)} 
+                        required 
+                        placeholder="6-digit pincode" 
+                        maxLength={6} 
+                      />
                     </div>
                   </div>
                   <div className={styles.formGroup}>
@@ -538,9 +580,15 @@ export default function CheckoutPage() {
                     <label>Area / Landmark (Optional)</label>
                     <input type="text" value={formData.address2} onChange={e => setFormData({...formData, address2: e.target.value})} placeholder="e.g., Near Apollo Hospital" />
                   </div>
-                  <div className={styles.formGroup}>
-                    <label>City</label>
-                    <input type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} placeholder="City name" />
+                  <div className={styles.formGrid}>
+                    <div className={styles.formGroup}>
+                      <label>City *</label>
+                      <input type="text" value={formData.city} onChange={e => setFormData({...formData, city: e.target.value})} required placeholder="City name" />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label>State *</label>
+                      <input type="text" value={formData.state || ''} onChange={e => setFormData({...formData, state: e.target.value})} required placeholder="State name" />
+                    </div>
                   </div>
                   <div className={styles.formActions}>
                     <button type="submit" className={styles.saveBtn}>{editingAddressId ? 'Update Address' : 'Deliver to this address'}</button>
@@ -564,7 +612,10 @@ export default function CheckoutPage() {
                           <button onClick={(e) => handleDeleteAddress(addr.id, e)} className={styles.deleteText}>Delete</button>
                         </div>
                       </div>
-                      <p className={styles.addrText}>{addr.address1}, {addr.address2 && `${addr.address2}, `}{addr.city} - {addr.pincode}</p>
+                      <p className={styles.addrText}>
+                        {addr.address1}, {addr.address2 && `${addr.address2}, `}
+                        {addr.city}{addr.state && `, ${addr.state}`} - {addr.pincode}
+                      </p>
                       <p className={styles.addrPhone}>Phone: {addr.phone}</p>
                     </div>
                   ))}
