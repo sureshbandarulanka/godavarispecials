@@ -131,6 +131,29 @@ export default function CheckoutPage() {
     }
   }, [isFormOpen, editingAddressId, location]);
 
+  // Auto-detect state based on Pincode (Indian Pincodes are 6 digits)
+  useEffect(() => {
+    const detectState = async () => {
+      const pin = formData.pincode;
+      if (/^[1-9][0-9]{5}$/.test(pin)) {
+        try {
+          const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+          const data = await res.json();
+          if (data && data[0]?.Status === "Success" && data[0]?.PostOffice?.[0]) {
+            const state = data[0].PostOffice[0].State;
+            setFormData(prev => ({
+              ...prev,
+              state: state
+            }));
+          }
+        } catch (err) {
+          console.error("Failed to auto-detect state from pincode:", err);
+        }
+      }
+    };
+    detectState();
+  }, [formData.pincode]);
+
   // Handle Smart Auto-Apply Logic
   useEffect(() => {
     if (isClient && user && cartTotal > 0 && !manualCouponApplied) {

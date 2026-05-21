@@ -20,7 +20,7 @@ export const fetchFirebaseData = async () => {
 
     // 🔥 Filter by Schedule and Sort
     firebaseProducts = products
-      .filter(isActiveBySchedule)
+      .filter(p => !p.isDeleted && isActiveBySchedule(p))
       .sort((a: any, b: any) => {
         if (a.priority !== undefined && b.priority !== undefined) {
           return a.priority - b.priority;
@@ -53,7 +53,7 @@ export const subscribeToProducts = (
 
       // 🔥 Filter by Schedule and Sort
       const activeProducts = products
-        .filter(isActiveBySchedule)
+        .filter(p => !p.isDeleted && isActiveBySchedule(p))
         .sort((a: any, b: any) => {
           if (a.priority !== undefined && b.priority !== undefined) {
             return a.priority - b.priority;
@@ -674,11 +674,13 @@ export const getProductsAsync = async () => {
   try {
     const productsQuery = query(collection(db, "products"), orderBy("name", "asc"));
     const querySnapshot = await getDocs(productsQuery);
-    return querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      name: doc.data().name,
-      category: doc.data().category
-    }));
+    return querySnapshot.docs
+      .filter(doc => !doc.data().isDeleted)
+      .map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+        category: doc.data().category
+      }));
   } catch (error) {
     console.error("Error fetching products:", error);
     throw error;
