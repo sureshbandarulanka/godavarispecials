@@ -109,6 +109,8 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://maps.googleapis.com" />
         <link rel="preconnect" href="https://maps.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://firebasestorage.googleapis.com" />
+        <link rel="dns-prefetch" href="https://freeipapi.com" />
+        <link rel="dns-prefetch" href="https://ipinfo.io" />
         <link rel="dns-prefetch" href="https://ipapi.co" />
       </head>
       <body className={inter.className} suppressHydrationWarning>

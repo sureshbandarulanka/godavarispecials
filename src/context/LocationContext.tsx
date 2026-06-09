@@ -106,26 +106,70 @@ export function LocationProvider({ children }: { children: React.ReactNode }) {
 
   const detectLocation = async () => {
     setIsDetecting(true);
-    try {
-      // SILENT DETECTION (IP-BASED)
-      const res = await fetch('https://ipapi.co/json/');
-      const data = await res.json();
-      
-      if (data.city) {
-        const country = data.country_name || "India";
-        updateLocation({
-          city: data.city,
-          state: data.region,
-          country: country,
-          source: 'auto',
-          isServiceable: country === "India"
-        });
+    
+    const geolocators = [
+      // 1. Try freeipapi.com (No token required, HTTPS free, unlimited)
+      async () => {
+        const res = await fetch('https://freeipapi.com/api/json');
+        const data = await res.json();
+        if (data && data.cityName) {
+          return {
+            city: data.cityName,
+            state: data.regionName,
+            country: data.countryName || "India",
+          };
+        }
+        throw new Error('Invalid data from freeipapi.com');
+      },
+      // 2. Try ipinfo.io (50k free requests per month, highly reliable)
+      async () => {
+        const res = await fetch('https://ipinfo.io/json');
+        const data = await res.json();
+        if (data && data.city) {
+          let country = data.country || "India";
+          if (country === "IN") country = "India";
+          return {
+            city: data.city,
+            state: data.region,
+            country: country,
+          };
+        }
+        throw new Error('Invalid data from ipinfo.io');
+      },
+      // 3. Try ipapi.co (often rate limited, but keeps as fallback)
+      async () => {
+        const res = await fetch('https://ipapi.co/json/');
+        const data = await res.json();
+        if (data && data.city) {
+          return {
+            city: data.city,
+            state: data.region,
+            country: data.country_name || "India",
+          };
+        }
+        throw new Error('Invalid data from ipapi.co');
       }
-    } catch (error) {
-      console.error('Silent location detection failed:', error);
-    } finally {
-      setIsDetecting(false);
+    ];
+
+    for (const geolocator of geolocators) {
+      try {
+        const locData = await geolocator();
+        updateLocation({
+          city: locData.city,
+          state: locData.state,
+          country: locData.country,
+          source: 'auto',
+          isServiceable: locData.country === "India"
+        });
+        console.log('Location detected successfully using IP:', locData);
+        setIsDetecting(false);
+        return; // Success!
+      } catch (err) {
+        console.warn('Geolocator attempt failed:', err);
+      }
     }
+    
+    setIsDetecting(false);
   };
 
   return (
