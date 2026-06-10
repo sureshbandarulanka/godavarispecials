@@ -49,6 +49,9 @@ export default function AddProductPage() {
     isTopSelling: false,
   });
 
+  const selectedCat = categories.find(c => c.name === formData.category);
+  const isPickleCategory = !!(selectedCat?.slug === 'pickles' || formData.category?.toLowerCase() === 'pickles' || formData.category?.toLowerCase() === 'pickle');
+
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
@@ -89,7 +92,15 @@ export default function AddProductPage() {
   // Remove old getCategories useEffect
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'category') {
+      const selectedCatObj = categories.find(c => c.name === value);
+      const isPickle = !!(selectedCatObj?.slug === 'pickles' || value?.toLowerCase() === 'pickles' || value?.toLowerCase() === 'pickle');
+      if (!isPickle) {
+        setSelectedSections(prev => prev.filter(s => s === 'top-selling-specials'));
+      }
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -156,7 +167,7 @@ export default function AddProductPage() {
         variants: variants.map(({ id, ...rest }) => rest),
         image: '', // Primary image (first one)
         images: [], // All images
-        sections: selectedSections,
+        sections: isPickleCategory ? selectedSections : selectedSections.filter(s => s === 'top-selling-specials'),
         createdAt: new Date().toISOString()
       };
 
@@ -308,40 +319,42 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group" style={{ width: '100%' }}>
-                <label className="form-label">Select Homepage Sections</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '8px' }}>
-                  {sections.map((sec) => (
-                    <label key={sec.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#334155' }}>
-                      <input
-                        type="checkbox"
-                        value={sec.slug}
-                        checked={selectedSections.includes(sec.slug)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedSections([...selectedSections, sec.slug]);
-                            if (sec.slug === 'top-selling-specials') {
-                              setFormData(prev => ({ ...prev, isTopSelling: true }));
+            {isPickleCategory && (
+              <div className="form-row">
+                <div className="form-group" style={{ width: '100%' }}>
+                  <label className="form-label">Select Homepage Sections</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px', background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginTop: '8px' }}>
+                    {sections.map((sec) => (
+                      <label key={sec.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', color: '#334155' }}>
+                        <input
+                          type="checkbox"
+                          value={sec.slug}
+                          checked={selectedSections.includes(sec.slug)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedSections([...selectedSections, sec.slug]);
+                              if (sec.slug === 'top-selling-specials') {
+                                setFormData(prev => ({ ...prev, isTopSelling: true }));
+                              }
+                            } else {
+                              setSelectedSections(selectedSections.filter(s => s !== sec.slug));
+                              if (sec.slug === 'top-selling-specials') {
+                                setFormData(prev => ({ ...prev, isTopSelling: false }));
+                              }
                             }
-                          } else {
-                            setSelectedSections(selectedSections.filter(s => s !== sec.slug));
-                            if (sec.slug === 'top-selling-specials') {
-                              setFormData(prev => ({ ...prev, isTopSelling: false }));
-                            }
-                          }
-                        }}
-                        style={{ width: '16px', height: '16px', accentColor: '#f97316' }}
-                      />
-                      <span>{sec.name}</span>
-                    </label>
-                  ))}
+                          }}
+                          style={{ width: '16px', height: '16px', accentColor: '#f97316' }}
+                        />
+                        <span>{sec.name}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <p style={{ color: '#64748b', fontSize: '11px', margin: '6px 0 0 0' }}>
+                    Choose which homepage rows this product should be displayed in. Standard categories will fall back automatically.
+                  </p>
                 </div>
-                <p style={{ color: '#64748b', fontSize: '11px', margin: '6px 0 0 0' }}>
-                  Choose which homepage rows this product should be displayed in. Standard categories will fall back automatically.
-                </p>
               </div>
-            </div>
+            )}
 
             <div className="form-row">
               <div className="form-group">
