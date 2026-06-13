@@ -73,9 +73,18 @@ export default function CategoryClient({ slug }: { slug: string }) {
     // Filter by Type
     if (typeFilter !== 'all') {
       result = result.filter(p => {
-        if (p.type) return p.type === typeFilter;
+        if (p.type) {
+          const normType = p.type.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const normFilter = typeFilter.toLowerCase().replace(/[^a-z0-9]/g, '');
+          if (normFilter === 'veg') return normType === 'veg';
+          if (normFilter === 'nonveg') return normType === 'nonveg';
+          return normType === normFilter;
+        }
+        
+        // Fallback name matching
         const isVeg = !p.name.toLowerCase().includes('chicken') && !p.name.toLowerCase().includes('mutton') && !p.name.toLowerCase().includes('fish') && !p.name.toLowerCase().includes('prawns');
-        return typeFilter === 'veg' ? isVeg : !isVeg;
+        const normFilter = typeFilter.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return normFilter === 'veg' ? isVeg : !isVeg;
       });
     }
 
@@ -165,7 +174,7 @@ export default function CategoryClient({ slug }: { slug: string }) {
               {targetCategory.types.map((type) => (
                 <button 
                   key={type}
-                  className={`${styles.subCategoryBtn} ${typeFilter === type ? styles.subCategoryBtnActive : ''}`}
+                  className={`${styles.subCategoryBtn} ${(typeFilter.toLowerCase().replace(/[^a-z0-9]/g, '') === type.toLowerCase().replace(/[^a-z0-9]/g, '')) ? styles.subCategoryBtnActive : ''}`}
                   onClick={() => setTypeFilter(type)}
                 >
                   {type.toLowerCase().includes('veg') && !type.toLowerCase().includes('non') ? (
@@ -193,7 +202,20 @@ export default function CategoryClient({ slug }: { slug: string }) {
 
             <div className={styles.filterGroup}>
               <label>Type:</label>
-              <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+              <select 
+                value={(() => {
+                  const norm = typeFilter.toLowerCase().replace(/[^a-z0-9]/g, '');
+                  if (norm === 'veg') return 'veg';
+                  if (norm === 'nonveg') return 'nonveg';
+                  if (norm === 'sweet') return 'sweet';
+                  if (norm === 'pindivantalu') return 'pindi-vantalu';
+                  if (norm === 'hotsnacks') return 'hot-snacks';
+                  if (norm === 'ghee') return 'ghee';
+                  if (norm === 'oil') return 'oil';
+                  return typeFilter;
+                })()} 
+                onChange={(e) => setTypeFilter(e.target.value)}
+              >
                 <option value="all">All Types</option>
                 {decodedCategory.toLowerCase() === 'pickles' ? (
                   <>
