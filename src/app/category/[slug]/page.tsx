@@ -10,7 +10,9 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const slug = (await params).slug;
   const categories = await getCategoriesAsync();
-  const category = categories.find(c => c.slug === slug);
+  const isPicklePartition = slug === 'veg-pickles' || slug === 'non-veg-pickles' || slug === 'traditional-veg-pickles';
+  const baseSlug = isPicklePartition ? 'pickles' : slug;
+  const category = categories.find(c => c.slug === baseSlug);
 
   if (!category) {
     return {
@@ -18,9 +20,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  let name = category.name;
+  if (slug === 'veg-pickles' || slug === 'traditional-veg-pickles') {
+    name = 'Veg Pickles';
+  } else if (slug === 'non-veg-pickles') {
+    name = 'Non-Veg Pickles';
+  }
+
   return {
-    title: `${category.name} | Authentic Godavari Homemade`,
-    description: `Shop the best ${category.name} from Godavari. 100% natural, homemade, and delivered fresh to your home.`,
+    title: `${name} | Authentic Godavari Homemade`,
+    description: `Shop the best ${name} from Godavari. 100% natural, homemade, and delivered fresh to your home.`,
   };
 }
 

@@ -121,9 +121,7 @@ export default function HomeContent({
       const isAlternate = index % 2 !== 0;
 
       // Redirection slug for "View All" buttons on pickles partitioned sections
-      const targetSlug = (sec.slug === 'non-veg-pickles' || sec.slug === 'traditional-veg-pickles') 
-        ? 'pickles' 
-        : sec.slug;
+      const targetSlug = sec.slug;
 
       return (
         <CategorySection 

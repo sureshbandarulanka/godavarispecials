@@ -12,7 +12,9 @@ export async function generateMetadata(
   const slug = (await params).slug;
   
   try {
-    const category = await getCategoryBySlugAsync(slug);
+    const isPicklePartition = slug === 'veg-pickles' || slug === 'non-veg-pickles' || slug === 'traditional-veg-pickles';
+    const baseSlug = isPicklePartition ? 'pickles' : slug;
+    const category = await getCategoryBySlugAsync(baseSlug);
 
     if (!category) {
       return {
@@ -21,8 +23,15 @@ export async function generateMetadata(
     }
 
     const previousImages = (await parent).openGraph?.images || [];
-    const title = `${category.name} - Buy Online | Godavari Specials`;
-    const description = `Shop authentic ${category.name} from Rajahmundry. Godavari Specials brings you the finest selection of homemade pickles, powders, and more. Free delivery available.`;
+    let name = category.name;
+    if (slug === 'veg-pickles' || slug === 'traditional-veg-pickles') {
+      name = 'Veg Pickles';
+    } else if (slug === 'non-veg-pickles') {
+      name = 'Non-Veg Pickles';
+    }
+
+    const title = `${name} - Buy Online | Godavari Specials`;
+    const description = `Shop authentic ${name} from Rajahmundry. Godavari Specials brings you the finest selection of homemade pickles, powders, and more. Free delivery available.`;
 
     return {
       title,

@@ -22,8 +22,20 @@ export default function CategoryClient({ slug }: { slug: string }) {
   const [sortOption, setSortOption] = useState('relevant');
   const [showFilters, setShowFilters] = useState(false);
   
-  const targetCategory = categories.find(c => c.slug === slug);
+  const isPicklePartition = slug === 'veg-pickles' || slug === 'non-veg-pickles' || slug === 'traditional-veg-pickles';
+  const baseSlug = isPicklePartition ? 'pickles' : slug;
+  
+  const targetCategory = categories.find(c => c.slug === baseSlug);
   const decodedCategory = targetCategory ? targetCategory.name : '';
+
+  let pageTitle = decodedCategory;
+  if (isPicklePartition) {
+    if (slug === 'veg-pickles' || slug === 'traditional-veg-pickles') {
+      pageTitle = 'Veg Pickles';
+    } else if (slug === 'non-veg-pickles') {
+      pageTitle = 'Non-Veg Pickles';
+    }
+  }
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -35,16 +47,25 @@ export default function CategoryClient({ slug }: { slug: string }) {
   }, [slug, router]);
 
   useEffect(() => {
+    const initialType = (slug === 'veg-pickles' || slug === 'traditional-veg-pickles') 
+      ? 'veg' 
+      : (slug === 'non-veg-pickles' ? 'nonveg' : 'all');
+    setTypeFilter(initialType);
+    setPriceFilter('all');
+    setSortOption('relevant');
+  }, [slug]);
+
+  useEffect(() => {
     if (categoriesLoading || !slug) return;
 
     const unsubscribe = subscribeToProducts(
       (allProducts) => {
-        const filtered = allProducts.filter((p: any) => p.categorySlug === slug);
+        const filtered = allProducts.filter((p: any) => p.categorySlug === baseSlug);
         setProducts(filtered);
       }
     );
     return () => unsubscribe();
-  }, [slug, categoriesLoading]);
+  }, [baseSlug, categoriesLoading, slug]);
 
   useEffect(() => {
     let result = [...products];
@@ -95,7 +116,7 @@ export default function CategoryClient({ slug }: { slug: string }) {
                  ))}
                </div>
             ) : categories.map((cat, idx) => {
-              const isActive = cat.slug === slug;
+              const isActive = cat.slug === baseSlug;
               return (
                 <div 
                   key={cat.id || idx} 
@@ -116,7 +137,7 @@ export default function CategoryClient({ slug }: { slug: string }) {
                 <h1 className={styles.pageTitle}>
                   {categoriesLoading ? (
                     <div className="skeleton" style={{ width: '150px', height: '28px', borderRadius: '6px' }} />
-                  ) : (decodedCategory || "Category")}
+                  ) : (pageTitle || "Category")}
                 </h1>
                 <span className={styles.productCount}>{filteredProducts.length} {filteredProducts.length === 1 ? 'item' : 'items'}</span>
               </div>
@@ -225,7 +246,7 @@ export default function CategoryClient({ slug }: { slug: string }) {
             <div className={styles.emptyState}>
               <div className={styles.emptyIcon}>🛍️</div>
               <h3 className={styles.emptyTitle}>No products available</h3>
-              <p className={styles.emptySub}>We couldn't find any products in "{decodedCategory}".</p>
+              <p className={styles.emptySub}>We couldn't find any products in "{pageTitle}".</p>
               <button 
                 className="btn-primary" 
                 style={{marginTop: '24px'}}
