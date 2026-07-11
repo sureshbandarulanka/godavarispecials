@@ -34,6 +34,7 @@ interface Order {
   createdAt: any;
   items: any[];
   address: any;
+  isDeleted?: boolean;
 }
 
 export default function DashboardPage() {
