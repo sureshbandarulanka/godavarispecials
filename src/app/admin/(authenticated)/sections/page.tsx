@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useSections } from '@/context/SectionContext';
+import { useCategories } from '@/context/CategoryContext';
 import { 
   addSection, 
   updateSection, 
@@ -117,6 +118,7 @@ function SortableSectionRow({
 
 export default function AdminSectionsPage() {
   const { sections: contextSections, loading, refreshSections } = useSections();
+  const { categories } = useCategories();
   const [sections, setSections] = useState<Section[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'add' | 'edit'>('add');
@@ -125,6 +127,7 @@ export default function AdminSectionsPage() {
   const [formName, setFormName] = useState('');
   const [formSlug, setFormSlug] = useState('');
   const [formType, setFormType] = useState<'dynamic' | 'custom'>('custom');
+  const [selectedCategoryId, setSelectedCategoryId] = useState('');
   
   const [deleteData, setDeleteData] = useState<{ id: string, name: string } | null>(null);
   const [saving, setSaving] = useState(false);
@@ -185,6 +188,7 @@ export default function AdminSectionsPage() {
     setFormName('');
     setFormSlug('');
     setFormType('custom');
+    setSelectedCategoryId('');
     setModalOpen(true);
   };
 
@@ -194,7 +198,21 @@ export default function AdminSectionsPage() {
     setFormName(sec.name);
     setFormSlug(sec.slug);
     setFormType(sec.type);
+    const matchingCat = categories.find(c => c.slug === sec.slug);
+    setSelectedCategoryId(matchingCat ? matchingCat.id : '');
     setModalOpen(true);
+  };
+
+  const handleCategorySelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const catId = e.target.value;
+    setSelectedCategoryId(catId);
+    if (catId) {
+      const cat = categories.find(c => c.id === catId);
+      if (cat) {
+        setFormName(cat.name);
+        setFormSlug(cat.slug);
+      }
+    }
   };
 
   const generateSlug = (val: string) => {
@@ -391,6 +409,21 @@ export default function AdminSectionsPage() {
             </h2>
             
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                <label className="form-label" style={{ fontWeight: 600, fontSize: '13px' }}>Select Existing Category (Optional)</label>
+                <select 
+                  className="form-select" 
+                  value={selectedCategoryId}
+                  onChange={handleCategorySelectChange}
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', background: '#fff' }}
+                >
+                  <option value="">-- Or type manually --</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.id}>{c.name} ({c.slug})</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <label className="form-label" style={{ fontWeight: 600, fontSize: '13px' }}>Section Name</label>
                 <input 

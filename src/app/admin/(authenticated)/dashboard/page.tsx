@@ -59,7 +59,8 @@ export default function DashboardPage() {
         setAllProducts(products);
         
         const data = await getOrdersAsync();
-        setOrders(data as Order[]);
+        const activeOrders = (data as Order[]).filter(o => !o.isDeleted);
+        setOrders(activeOrders);
 
         const visits = await getTodayVisits();
         setTodayVisitsCount(visits);
@@ -415,6 +416,13 @@ export default function DashboardPage() {
             <tbody>
               {recentOrders.map((order) => {
                 const date = order.createdAt?.toDate ? order.createdAt.toDate() : new Date(order.createdAt);
+                const formattedDateTime = date.toLocaleString('en-IN', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  hour12: true
+                });
                 return (
                   <tr key={order.id}>
                     <td style={{ fontWeight: 600, color: '#3b82f6' }}>{order.orderId}</td>
@@ -430,7 +438,7 @@ export default function DashboardPage() {
                       </span>
                     </td>
                     <td style={{ fontSize: '13px', color: '#64748b' }}>
-                      {date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                      {formattedDateTime}
                     </td>
                   </tr>
                 );
@@ -538,6 +546,7 @@ export default function DashboardPage() {
                   <thead>
                     <tr>
                       <th>Order ID</th>
+                      <th>Date & Time</th>
                       <th>Customer</th>
                       <th>Items</th>
                       <th>Total</th>
@@ -553,20 +562,32 @@ export default function DashboardPage() {
                         const date = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
                         return date >= today;
                       })
-                      .map((o, i) => (
-                        <tr key={i}>
-                          <td style={{ fontWeight: 600, color: '#3b82f6' }}>{o.orderId}</td>
-                          <td>{o.address?.name || 'Guest'}</td>
-                          <td>{o.items?.length || 0} items</td>
-                          <td>₹{o.total}</td>
-                          <td>
-                            <span className={`badge ${
-                              o.status === 'Delivered' ? 'badge-success' : 
-                              o.status === 'Cancelled' ? 'badge-error' : 'badge-info'
-                            }`}>{o.status}</span>
-                          </td>
-                        </tr>
-                      ))}
+                      .map((o, i) => {
+                        const date = o.createdAt?.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+                        const formattedDateTime = date.toLocaleString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true
+                        });
+                        return (
+                          <tr key={i}>
+                            <td style={{ fontWeight: 600, color: '#3b82f6' }}>{o.orderId}</td>
+                            <td style={{ fontSize: '13px', color: '#64748b' }}>{formattedDateTime}</td>
+                            <td>{o.address?.name || 'Guest'}</td>
+                            <td>{o.items?.length || 0} items</td>
+                            <td>₹{o.total}</td>
+                            <td>
+                              <span className={`badge ${
+                                o.status === 'Delivered' ? 'badge-success' : 
+                                o.status === 'Cancelled' ? 'badge-error' : 'badge-info'
+                              }`}>{o.status}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
                   </tbody>
                 </table>
               ) : modalType === 'products' ? (
