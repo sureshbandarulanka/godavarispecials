@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { addProduct, fetchFirebaseData, uploadProductImage, updateProduct } from '@/services/productService';
+import { addProduct, fetchFirebaseData, uploadProductImage, updateProduct, updateCategory } from '@/services/productService';
 import { useCategories } from '@/context/CategoryContext';
 import { useSections } from '@/context/SectionContext';
 import Link from 'next/link';
@@ -39,18 +39,17 @@ export default function AddProductPage() {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [newProductType, setNewProductType] = useState('');
+  const [addingType, setAddingType] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     description: '',
-    type: 'veg' as 'veg' | 'non-veg' | 'sweet' | 'pindi-vantalu' | 'hot-snacks' | 'ghee' | 'oil',
+    type: 'veg' as string,
     isOutOfStock: false,
     isTopSelling: false,
   });
-
-  const selectedCat = categories.find(c => c.name === formData.category);
-  const isPickleCategory = !!(selectedCat?.slug === 'pickles' || formData.category?.toLowerCase() === 'pickles' || formData.category?.toLowerCase() === 'pickle');
 
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -93,14 +92,51 @@ export default function AddProductPage() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    if (name === 'category') {
-      const selectedCatObj = categories.find(c => c.name === value);
-      const isPickle = !!(selectedCatObj?.slug === 'pickles' || value?.toLowerCase() === 'pickles' || value?.toLowerCase() === 'pickle');
-      if (!isPickle) {
-        setSelectedSections(prev => prev.filter(s => s === 'top-selling-specials'));
-      }
-    }
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleAddNewProductType = async () => {
+    if (!newProductType.trim()) return;
+    if (!formData.category) {
+      alert('Please select a category first.');
+      return;
+    }
+
+    setAddingType(true);
+    try {
+      const selectedCatObj = categories.find(c => c.name === formData.category);
+      if (!selectedCatObj) {
+        alert('Selected category not found.');
+        return;
+      }
+
+      const currentTypes = selectedCatObj.types || [];
+      const trimmedType = newProductType.trim();
+      
+      if (currentTypes.includes(trimmedType)) {
+        alert('This type already exists under this category.');
+        setNewProductType('');
+        return;
+      }
+
+      const updatedTypes = [...currentTypes, trimmedType];
+      const { id: catId, ...payload } = selectedCatObj;
+
+      await updateCategory(selectedCatObj.id, {
+        ...payload,
+        types: updatedTypes
+      });
+
+      setFormData(prev => ({ ...prev, type: trimmedType }));
+      setNewProductType('');
+      setToast('New product type added to category!');
+      setTimeout(() => setToast(null), 2000);
+    } catch (err) {
+      console.error("Failed to add new type:", err);
+      alert("Failed to add new product type to category.");
+    } finally {
+      setAddingType(false);
+    }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -167,7 +203,7 @@ export default function AddProductPage() {
         variants: variants.map(({ id, ...rest }) => rest),
         image: '', // Primary image (first one)
         images: [], // All images
-        sections: isPickleCategory ? selectedSections : selectedSections.filter(s => s === 'top-selling-specials'),
+        sections: selectedSections,
         createdAt: new Date().toISOString()
       };
 
@@ -244,28 +280,58 @@ export default function AddProductPage() {
             <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Product Type</label>
-                <select 
-                  name="type" 
-                  className="form-select" 
-                  value={formData.type}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Select Type</option>
-                  {/* Show category specific types if available */}
-                  {categories.find(c => c.name === formData.category)?.types?.map(t => (
-                    <option key={t} value={t}>{t}</option>
-                  )) || (
-                    <>
-                      <option value="veg">Veg</option>
-                      <option value="non-veg">Non-Veg</option>
-                      <option value="sweet">Sweet</option>
-                      <option value="pindi-vantalu">Pindi Vantalu</option>
-                      <option value="hot-snacks">Hot Snacks</option>
-                      <option value="ghee">Ghee</option>
-                      <option value="oil">Oil</option>
-                    </>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <select 
+                    name="type" 
+                    className="form-select" 
+                    value={formData.type}
+                    onChange={handleInputChange}
+                  >
+                    <option value="">Select Type</option>
+                    {/* Show category specific types if available */}
+                    {categories.find(c => c.name === formData.category)?.types?.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    )) || (
+                      <>
+                        <option value="veg">Veg</option>
+                        <option value="non-veg">Non-Veg</option>
+                        <option value="sweet">Sweet</option>
+                        <option value="pindi-vantalu">Pindi Vantalu</option>
+                        <option value="hot-snacks">Hot Snacks</option>
+                        <option value="ghee">Ghee</option>
+                        <option value="oil">Oil</option>
+                      </>
+                    )}
+                  </select>
+                  
+                  {formData.category && (
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <input 
+                        type="text" 
+                        placeholder="Add custom product type..." 
+                        className="form-input" 
+                        style={{ fontSize: '13px', padding: '8px 12px', flex: 1 }}
+                        value={newProductType}
+                        onChange={(e) => setNewProductType(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddNewProductType();
+                          }
+                        }}
+                      />
+                      <button 
+                        type="button" 
+                        className="btn-primary" 
+                        style={{ fontSize: '12px', padding: '8px 16px', height: '38px', background: '#f97316', borderColor: '#f97316' }}
+                        onClick={handleAddNewProductType}
+                        disabled={addingType}
+                      >
+                        {addingType ? 'Adding...' : '+ Add'}
+                      </button>
+                    </div>
                   )}
-                </select>
+                </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Availability</label>
@@ -319,7 +385,7 @@ export default function AddProductPage() {
               </div>
             </div>
 
-            {isPickleCategory && (
+            {formData.category && (
               <div className="form-row">
                 <div className="form-group" style={{ width: '100%' }}>
                   <label className="form-label">Select Homepage Sections</label>
