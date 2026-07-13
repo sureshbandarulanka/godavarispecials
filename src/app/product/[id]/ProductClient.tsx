@@ -106,8 +106,12 @@ export default function ProductClient({
   
   const [selectedVariant, setSelectedVariant] = useState<any>(() => {
     if (initialProduct?.variants && initialProduct.variants.length > 0) {
-      const default500g = initialProduct.variants.find((v: any) => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
-      return default500g || initialProduct.variants[0];
+      const defaultVariant = initialProduct.variants.find((v: any) => {
+        if (!v.weight) return false;
+        const normalized = v.weight.replace(/\s/g, '').toLowerCase();
+        return normalized === '500g' || normalized === '500ml';
+      });
+      return defaultVariant || initialProduct.variants[0];
     }
     return null;
   });
@@ -142,8 +146,12 @@ export default function ProductClient({
         
         setSelectedVariant((prev: any) => {
           if (!prev) {
-            const default500g = foundProduct.variants.find((v: any) => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
-            return default500g || foundProduct.variants[0];
+            const defaultVariant = foundProduct.variants.find((v: any) => {
+              if (!v.weight) return false;
+              const normalized = v.weight.replace(/\s/g, '').toLowerCase();
+              return normalized === '500g' || normalized === '500ml';
+            });
+            return defaultVariant || foundProduct.variants[0];
           }
           const updatedVariant = foundProduct.variants.find((v: any) => v.weight === prev.weight);
           return updatedVariant || prev;

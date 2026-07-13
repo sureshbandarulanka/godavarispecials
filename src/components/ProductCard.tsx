@@ -87,8 +87,12 @@ export default function ProductCard({ product }: { product: Product }) {
   
   const [selectedVariant, setSelectedVariant] = React.useState(() => {
     if (product.variants && product.variants.length > 0) {
-      const default500g = product.variants.find(v => v.weight && v.weight.replace(/\s/g, '').toLowerCase() === '500g');
-      return default500g || product.variants[0];
+      const defaultVariant = product.variants.find(v => {
+        if (!v.weight) return false;
+        const normalized = v.weight.replace(/\s/g, '').toLowerCase();
+        return normalized === '500g' || normalized === '500ml';
+      });
+      return defaultVariant || product.variants[0];
     }
     return { weight: 'Default', price: 0 } as any;
   });
