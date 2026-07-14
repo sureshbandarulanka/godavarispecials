@@ -136,10 +136,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     await serviceLogout();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('login_prompt_dismissed');
+    }
   };
 
   const openLoginModal = () => setIsLoginModalOpen(true);
-  const closeLoginModal = () => setIsLoginModalOpen(false);
+  const closeLoginModal = () => {
+    setIsLoginModalOpen(false);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('login_prompt_dismissed', 'true');
+    }
+  };
 
   return (
     <AuthContext.Provider value={{ 

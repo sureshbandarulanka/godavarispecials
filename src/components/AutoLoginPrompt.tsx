@@ -19,7 +19,12 @@ export default function AutoLoginPrompt() {
     // 2. Skip on sensitive routes where modal might be distracting (e.g., admin checkout for now)
     if (pathname.includes('/admin')) return;
 
-    // 3. 2-second polite delay for a smooth guest transition
+    // 3. Skip if the auto-login prompt has been dismissed by the user
+    if (typeof window !== "undefined" && localStorage.getItem('login_prompt_dismissed') === 'true') {
+      return;
+    }
+
+    // 4. 2-second polite delay for a smooth guest transition
     const timer = setTimeout(() => {
       if (!user && !isLoginModalOpen) {
         openLoginModal();
